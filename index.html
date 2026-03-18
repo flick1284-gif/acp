@@ -253,7 +253,7 @@ footer{background:var(--maroon);padding:2rem;text-align:center;font-size:13px;co
 .dropdown-arrow{font-size:10px;margin-left:4px;opacity:.6;}
 .resource-section{margin-bottom:3.5rem;}
 .soc-btn{color:rgba(255,255,255,.75);}.soc-btn:hover{color:white;}.soc-btn svg{display:block;}
-.ham-btn{display:none;background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;flex-direction:column;gap:5px;align-items:center;justify-content:center;}
+.ham-btn{display:none;background:none;border:none;cursor:pointer;padding:6px;flex-direction:column;gap:5px;align-items:center;justify-content:center;}
 .ham-btn span{display:block;width:22px;height:2px;background:var(--maroon);border-radius:2px;transition:all .25s;}
 .ham-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
 .ham-btn.open span:nth-child(2){opacity:0;}
@@ -267,10 +267,8 @@ footer{background:var(--maroon);padding:2rem;text-align:center;font-size:13px;co
 .mobile-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--maroon);line-height:1;padding:4px;}
 .mobile-nav-links{flex:1;overflow-y:auto;padding:.75rem 0;}
 .mobile-nav-links a{display:block;padding:.85rem 1.4rem;font-size:15px;font-weight:700;color:var(--maroon);cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border);}
-.mobile-nav-links a:hover{background:var(--maroon-light);}
-.mobile-nav-links a.active{color:var(--red-accent);background:var(--maroon-light);}
-.mobile-sub{padding-left:.5rem;}
-.mobile-sub a{font-size:13px;font-weight:600;color:var(--maroon-mid);border-bottom:none !important;padding:.6rem 1.8rem !important;}
+.mobile-nav-links a:hover,.mobile-nav-links a.active{background:var(--maroon-light);}
+.mobile-sub a{font-size:13px;font-weight:600;border-bottom:none !important;padding:.6rem 1.8rem !important;}
 .mobile-donate-wrap{padding:1.25rem;}
 .mobile-donate-btn{width:100%;background:var(--donate-btn);color:white;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}
 @media(max-width:768px){
@@ -283,6 +281,25 @@ footer{background:var(--maroon);padding:2rem;text-align:center;font-size:13px;co
 </style>
 </head>
 <body>
+
+<!--BAKED-DATA-->
+
+<script>
+// Load baked-in data snapshot if present (set by admin download)
+if (typeof BAKED !== 'undefined') {
+  try {
+    if (BAKED.content)  localStorage.setItem('acp-content',    JSON.stringify(BAKED.content));
+    if (BAKED.videos)   localStorage.setItem('acp-videos',     JSON.stringify(BAKED.videos));
+    if (BAKED.photos)   localStorage.setItem('acp-photos',     JSON.stringify(BAKED.photos));
+    if (BAKED.events)   localStorage.setItem('acp-events',     JSON.stringify(BAKED.events));
+    if (BAKED.resAW)    localStorage.setItem('acp-res-aw',     JSON.stringify(BAKED.resAW));
+    if (BAKED.resCB)    localStorage.setItem('acp-res-cb',     JSON.stringify(BAKED.resCB));
+    if (BAKED.resAR)    localStorage.setItem('acp-res-ar',     JSON.stringify(BAKED.resAR));
+    if (BAKED.programs) localStorage.setItem('acp-programs',   JSON.stringify(BAKED.programs));
+    if (BAKED.stripe)   localStorage.setItem('acp-stripe-link',JSON.stringify(BAKED.stripe));
+  } catch(e) {}
+}
+</script>
 
 <nav>
   <div class="nav-inner">
@@ -332,21 +349,21 @@ footer{background:var(--maroon);padding:2rem;text-align:center;font-size:13px;co
   <div class="hero">
     <div class="hero-inner">
       <div class="hero-text">
-        <div class="hero-eyebrow">&#10022; Autistic-Led &amp; Community-Driven</div>
-        <h1>Build <em>WORK</em> that works for you!</h1>
-        <p>Career assessment, mentorship, and entrepreneurial skill building for autistic professionals and business owners.</p>
+        <div class="hero-eyebrow"><span id="hero-eyebrow-text">Autistic-Led &amp; Community-Driven</span></div>
+        <h1 id="hero-h1">Build <em>WORK</em> that works for you!</h1>
+        <p id="hero-body">Career assessment, mentorship, and entrepreneurial skill building for autistic professionals and business owners.</p>
         <div class="hero-btns">
-          <button class="btn-primary" onclick="showPage('programs')">Get Started</button>
-          <button class="btn-outline" onclick="showPage('video')">Watch Videos</button>
+          <button class="btn-primary" id="hero-btn-primary" onclick="showPage('programs')">Get Started</button>
+          <button class="btn-outline" id="hero-btn-secondary" onclick="showPage('video')">Watch Videos</button>
         </div>
       </div>
       <div class="hero-card">
-        <div class="hero-quote">"Autism Career Pathways gave me the tools to turn my passion into a real career path." &#8212; Community Member</div>
+        <div class="hero-quote" id="hero-quote">"Autism Career Pathways gave me the tools to turn my passion into a real career path." &#8212; Community Member</div>
         <div class="stats-grid">
-          <div class="stat-box"><span class="stat-num">500+</span><span class="stat-label">Members supported</span></div>
-          <div class="stat-box"><span class="stat-num">100%</span><span class="stat-label">Autistic-led</span></div>
-          <div class="stat-box"><span class="stat-num">Free</span><span class="stat-label">Resources &amp; courses</span></div>
-          <div class="stat-box"><span class="stat-num">3+</span><span class="stat-label">Active programs</span></div>
+          <div class="stat-box"><span class="stat-num" id="stat1-num">500+</span><span class="stat-label" id="stat1-label">Members supported</span></div>
+          <div class="stat-box"><span class="stat-num" id="stat2-num">100%</span><span class="stat-label" id="stat2-label">Autistic-led</span></div>
+          <div class="stat-box"><span class="stat-num" id="stat3-num">Free</span><span class="stat-label" id="stat3-label">Resources &amp; courses</span></div>
+          <div class="stat-box"><span class="stat-num" id="stat4-num">3+</span><span class="stat-label" id="stat4-label">Active programs</span></div>
         </div>
       </div>
     </div>
@@ -354,9 +371,9 @@ footer{background:var(--maroon);padding:2rem;text-align:center;font-size:13px;co
 
   <section class="carousel-section">
     <div class="container">
-      <div class="sec-tag">Our Community</div>
-      <h2 class="sec-title">Career Paths &amp; Success Stories</h2>
-      <p class="sec-sub">Celebrating the professional achievements and entrepreneurial spirit of our autistic role models.</p>
+      <div class="sec-tag" id="carousel-tag">Our Community</div>
+      <h2 class="sec-title" id="carousel-title">Career Paths &amp; Success Stories</h2>
+      <p class="sec-sub" id="carousel-body">Celebrating the professional achievements and entrepreneurial spirit of our autistic role models.</p>
       <div class="carousel-wrap">
         <div class="carousel-track" id="carousel-track"></div>
         <button class="car-btn car-prev" onclick="carMove(-1)">&#8592;</button>
@@ -370,18 +387,18 @@ footer{background:var(--maroon);padding:2rem;text-align:center;font-size:13px;co
     <div class="container">
       <div class="mission-grid">
         <div>
-          <div class="sec-tag">Our Mission</div>
-          <h2 class="sec-title">Empowering autistic individuals to build meaningful careers</h2>
+          <div class="sec-tag" id="mission-tag">Our Mission</div>
+          <h2 class="sec-title" id="mission-title">Empowering autistic individuals to build meaningful careers</h2>
           <div class="mission-body">
-            <p>Autism Career Pathways is a nonprofit organization dedicated to empowering autistic individuals of all ages to build meaningful and sustainable career pathways. We provide autistic-led resources, mentorship, and video-based learning created by autistic entrepreneurs and professionals.</p>
-            <p>Our evolving platform encourages community leaders to share knowledge and cultivate a supportive network that champions autistic-owned businesses and inclusive employment.</p>
-            <p>Together, we are building a more inclusive future for the next generation of autistic individuals.</p>
+            <p id="mission-p1">Autism Career Pathways is a nonprofit organization dedicated to empowering autistic individuals of all ages.</p>
+            <p id="mission-p2">Our evolving platform encourages community leaders to share knowledge.</p>
+            <p id="mission-p3">Together, we are building a more inclusive future.</p>
           </div>
         </div>
         <div class="mission-panel">
-          <div class="value-card"><div class="value-icon">&#127775;</div><div><h4>Autistic-Led</h4><p>Resources created by autistic professionals who understand the journey firsthand.</p></div></div>
-          <div class="value-card"><div class="value-icon">&#129309;</div><div><h4>Community-Driven</h4><p>A supportive network that champions autistic-owned businesses and inclusive employment.</p></div></div>
-          <div class="value-card"><div class="value-icon">&#128640;</div><div><h4>Future-Focused</h4><p>Building sustainable pathways for the next generation of autistic entrepreneurs.</p></div></div>
+          <div class="value-card"><div class="value-icon">&#127775;</div><div><h4 id="mission-v1-title">Autistic-Led</h4><p id="mission-v1-body">Resources created by autistic professionals.</p></div></div>
+          <div class="value-card"><div class="value-icon">&#129309;</div><div><h4 id="mission-v2-title">Community-Driven</h4><p id="mission-v2-body">A supportive network that champions autistic-owned businesses.</p></div></div>
+          <div class="value-card"><div class="value-icon">&#128640;</div><div><h4 id="mission-v3-title">Future-Focused</h4><p id="mission-v3-body">Building sustainable pathways for the next generation.</p></div></div>
         </div>
       </div>
     </div>
@@ -389,40 +406,40 @@ footer{background:var(--maroon);padding:2rem;text-align:center;font-size:13px;co
 
   <section class="programs-home">
     <div class="container">
-      <div class="sec-tag">What We Offer</div>
-      <h2 class="sec-title">Empowering autistic people to turn interests &amp; unique skills into meaningful careers</h2>
-      <p class="sec-sub">Three pathways designed to meet you where you are and take you where you want to go.</p>
+      <div class="sec-tag" id="programs-tag">What We Offer</div>
+      <h2 class="sec-title" id="programs-title">Empowering autistic people to turn interests &amp; unique skills into meaningful careers</h2>
+      <p class="sec-sub" id="programs-body">Three pathways designed to meet you where you are.</p>
       <div class="programs-grid">
-        <div class="prog-card"><div class="prog-icon">&#129517;</div><h3>Career Assessment</h3><p>The CAPABL tool helps you find your strengths, interests, and learning styles to map out your career path.</p><button class="prog-link" onclick="showPage('programs')">Find Yourself &#8594;</button></div>
-        <div class="prog-card"><div class="prog-icon">&#127891;</div><h3>Online Courses</h3><p>Find online courses led by autistic professionals helping parents and young adults develop skills and plan for future careers.</p><button class="prog-link" onclick="showPage('programs')">Start Building &#8594;</button></div>
-        <div class="prog-card"><div class="prog-icon">&#128172;</div><h3>Professional Mentorship</h3><p>Get advice from autistic mentors and business owners. Learn how to grow your career and balance work with your personal life.</p><button class="prog-link" onclick="showPage('programs')">Find a Mentor &#8594;</button></div>
+        <div class="prog-card"><div class="prog-icon">&#129517;</div><h3 id="prog-prev1-title">Career Assessment</h3><p id="prog-prev1-body">The CAPABL tool helps you find your strengths.</p><button class="prog-link" onclick="showPage('programs')">Find Yourself &#8594;</button></div>
+        <div class="prog-card"><div class="prog-icon">&#127891;</div><h3 id="prog-prev2-title">Online Courses</h3><p id="prog-prev2-body">Find online courses led by autistic professionals.</p><button class="prog-link" onclick="showPage('programs')">Start Building &#8594;</button></div>
+        <div class="prog-card"><div class="prog-icon">&#128172;</div><h3 id="prog-prev3-title">Professional Mentorship</h3><p id="prog-prev3-body">Get advice from autistic mentors and business owners.</p><button class="prog-link" onclick="showPage('programs')">Find a Mentor &#8594;</button></div>
       </div>
     </div>
   </section>
 
   <section class="contact">
     <div class="container">
-      <div class="sec-tag">Connect With Us</div>
-      <h2 class="sec-title">Start Your Career Journey</h2>
-      <p class="sec-sub">Connect with our team for resources, mentorship, and guidance tailored to your goals.</p>
+      <div class="sec-tag" id="contact-tag">Connect With Us</div>
+      <h2 class="sec-title" id="contact-title">Start Your Career Journey</h2>
+      <p class="sec-sub" id="contact-body">Connect with our team for resources, mentorship, and guidance.</p>
       <div class="contact-grid">
         <div class="contact-info">
           <h3>Get In Touch</h3>
-          <div class="cinfo-row"><div class="cinfo-icon">&#9993;</div>maisie@acpworks.org</div>
-          <div class="cinfo-row"><div class="cinfo-icon">&#128222;</div>(650) 483-7174</div>
+          <div class="cinfo-row"><div class="cinfo-icon">&#9993;</div><span id="contact-email">maisie@acpworks.org</span></div>
+          <div class="cinfo-row"><div class="cinfo-icon">&#128222;</div><span id="contact-phone">(650) 483-7174</span></div>
           <div class="socials">
-            <a href="https://www.facebook.com/autismcareerpathways/" class="soc-btn" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
-            <a href="https://www.instagram.com/autismcareerpathways/" class="soc-btn" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
-            <a href="http://www.youtube.com/@autismcareerpathways" class="soc-btn" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.495 6.205a3.007 3.007 0 00-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 00.527 6.205a31.247 31.247 0 00-.522 5.805 31.247 31.247 0 00.522 5.783 3.007 3.007 0 002.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 002.088-2.088 31.247 31.247 0 00.5-5.783 31.247 31.247 0 00-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg></a>
-            <a href="https://x.com/autisticcareers" class="soc-btn" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
-            <a href="http://www.linkedin.com/in/maisie-soetantyo" class="soc-btn" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+            <a id="soc-fb" href="https://www.facebook.com/autismcareerpathways/" class="soc-btn" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+            <a id="soc-ig" href="https://www.instagram.com/autismcareerpathways/" class="soc-btn" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+            <a id="soc-yt" href="http://www.youtube.com/@autismcareerpathways" class="soc-btn" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.495 6.205a3.007 3.007 0 00-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 00.527 6.205a31.247 31.247 0 00-.522 5.805 31.247 31.247 0 00.522 5.783 3.007 3.007 0 002.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 002.088-2.088 31.247 31.247 0 00.5-5.783 31.247 31.247 0 00-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg></a>
+            <a id="soc-x"  href="https://x.com/autisticcareers" class="soc-btn" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+            <a id="soc-li" href="http://www.linkedin.com/in/maisie-soetantyo" class="soc-btn" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
           </div>
         </div>
         <div class="cform">
           <div class="frow"><div class="fg"><label>First name *</label><input type="text" placeholder="Jane"></div><div class="fg"><label>Last name *</label><input type="text" placeholder="Smith"></div></div>
           <div class="fg"><label>Email address *</label><input type="email" placeholder="jane@example.com"></div>
           <div class="fg"><label>Phone number</label><input type="tel" placeholder="(555) 000-0000"></div>
-          <div class="fg"><label>What are you interested in? *</label><select><option value="">Select...</option><option>Online training</option><option>CAPABL career assessment</option><option>Becoming a mentor</option></select></div>
+          <div class="fg"><label>What are you interested in?</label><select><option value="">Select...</option><option>Online training</option><option>CAPABL career assessment</option><option>Becoming a mentor</option></select></div>
           <div class="fg"><label>Are you autistic or a caregiver?</label><select><option value="">Select...</option><option>Autistic individual</option><option>Caregiver / Parent</option><option>Professional / Ally</option></select></div>
           <div class="fg"><label>Tell us about yourself *</label><textarea placeholder="Share your background, goals, or what brings you here..."></textarea></div>
           <button class="fsub">Submit Information</button>
@@ -430,94 +447,90 @@ footer{background:var(--maroon);padding:2rem;text-align:center;font-size:13px;co
       </div>
     </div>
   </section>
-  <footer>&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
+  <footer class="site-footer">&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
 </div>
 
 <!-- ABOUT -->
 <div id="page-about" class="page">
-  <div class="page-hero"><div class="sec-tag">Who We Are</div><h1>About Us</h1><p>Learn about our mission, our team, and the community we are building together.</p></div>
+  <div class="page-hero"><div class="sec-tag" id="about-tag">Who We Are</div><h1 id="about-hero-title">About Us</h1><p id="about-hero-body">Learn about our mission, our team, and the community we are building together.</p></div>
   <div class="inner-content"><div class="inner-body">
-    <h2 class="sec-title">Our Story</h2>
-    <p>Autism Career Pathways is a nonprofit organization dedicated to empowering autistic individuals of all ages to build meaningful and sustainable career pathways.</p>
-    <p>We provide autistic-led resources, mentorship, and video-based learning created by autistic entrepreneurs and professionals. Our evolving platform encourages community leaders to share knowledge and cultivate a supportive network.</p>
-    <p>Together, we are building a more inclusive future for the next generation of autistic individuals.</p>
+    <h2 class="sec-title" id="about-story-title">Our Story</h2>
+    <p id="about-p1">Autism Career Pathways is a nonprofit organization dedicated to empowering autistic individuals of all ages.</p>
+    <p id="about-p2">We provide autistic-led resources, mentorship, and video-based learning.</p>
+    <p id="about-p3">Together, we are building a more inclusive future for the next generation of autistic individuals.</p>
   </div></div>
-  <footer>&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
+  <footer class="site-footer">&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
 </div>
 
 <!-- TRAINING -->
 <div id="page-events" class="page">
-  <div class="page-hero"><div class="sec-tag">Learn &amp; Grow</div><h1>Training</h1><p>Join our upcoming workshops, webinars, and training sessions led by autistic professionals.</p></div>
-  <div class="inner-content"><div class="inner-body">
-    <div class="items-list" id="events-list"></div>
-  </div></div>
-  <footer>&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
+  <div class="page-hero"><div class="sec-tag" id="training-tag">Learn &amp; Grow</div><h1 id="training-hero-title">Training</h1><p id="training-hero-body">Join our upcoming workshops, webinars, and training sessions led by autistic professionals.</p></div>
+  <div class="inner-content"><div class="inner-body"><div class="items-list" id="events-list"></div></div></div>
+  <footer class="site-footer">&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
 </div>
 
 <!-- RESOURCES -->
 <div id="page-resources" class="page">
-  <div class="page-hero"><div class="sec-tag">Tools &amp; Guides</div><h1>Resources</h1><p>Free tools, guides, and resources curated for autistic individuals and their supporters.</p></div>
+  <div class="page-hero"><div class="sec-tag" id="resources-tag">Tools &amp; Guides</div><h1 id="resources-hero-title">Resources</h1><p id="resources-hero-body">Free tools, guides, and resources curated for autistic individuals and their supporters.</p></div>
   <div class="inner-content"><div class="inner-body">
     <div id="anchor-autistically-wired" class="resource-section">
-      <div class="sec-tag">Community</div>
-      <h2 class="sec-title" style="font-size:1.6rem;margin-bottom:.5rem;">Autistically Wired</h2>
-      <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;">Resources, stories, and tools created by and for the autistic community.</p>
+      <div class="sec-tag" id="res-aw-tag">Community</div>
+      <h2 class="sec-title" style="font-size:1.6rem;margin-bottom:.5rem;" id="res-aw-title">Autistically Wired</h2>
+      <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;" id="res-aw-body">Resources, stories, and tools created by and for the autistic community.</p>
       <div class="items-list" id="resources-list-autistically-wired"></div>
     </div>
     <div id="anchor-certified-businesses" class="resource-section">
-      <div class="sec-tag">Directory</div>
-      <h2 class="sec-title" style="font-size:1.6rem;margin-bottom:.5rem;">Certified Businesses</h2>
-      <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;">Autistic-owned and neurodivergent-friendly certified businesses in our network.</p>
+      <div class="sec-tag" id="res-cb-tag">Directory</div>
+      <h2 class="sec-title" style="font-size:1.6rem;margin-bottom:.5rem;" id="res-cb-title">Certified Businesses</h2>
+      <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;" id="res-cb-body">Autistic-owned and neurodivergent-friendly certified businesses in our network.</p>
       <div class="items-list" id="resources-list-certified-businesses"></div>
     </div>
     <div id="anchor-additional-resources" class="resource-section">
-      <div class="sec-tag">More Resources</div>
-      <h2 class="sec-title" style="font-size:1.6rem;margin-bottom:.5rem;">Additional Resources</h2>
-      <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;">Guides, tools, templates, and external links to support your career journey.</p>
+      <div class="sec-tag" id="res-ar-tag">More Resources</div>
+      <h2 class="sec-title" style="font-size:1.6rem;margin-bottom:.5rem;" id="res-ar-title">Additional Resources</h2>
+      <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;" id="res-ar-body">Guides, tools, templates, and external links to support your career journey.</p>
       <div class="items-list" id="resources-list-additional-resources"></div>
     </div>
   </div></div>
-  <footer>&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
+  <footer class="site-footer">&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
 </div>
 
 <!-- PROGRAMS -->
 <div id="page-programs" class="page">
-  <div class="page-hero"><div class="sec-tag">Career Pathways</div><h1>Programs</h1><p>Explore our free programs designed to build skills, confidence, and career momentum.</p></div>
-  <div class="inner-content"><div class="inner-body">
-    <div class="items-list" id="programs-list"></div>
-  </div></div>
-  <footer>&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
+  <div class="page-hero"><div class="sec-tag" id="programs-page-tag">Career Pathways</div><h1 id="programs-page-hero-title">Programs</h1><p id="programs-page-hero-body">Explore our free programs designed to build skills, confidence, and career momentum.</p></div>
+  <div class="inner-content"><div class="inner-body"><div class="items-list" id="programs-list"></div></div></div>
+  <footer class="site-footer">&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
 </div>
 
 <!-- VIDEO -->
 <div id="page-video" class="page">
   <div class="page-hero">
-    <div class="sec-tag" style="color:rgba(255,180,180,.9);">Video Library</div>
-    <h1>Learn From Autistic Professionals</h1>
-    <p>Watch talks, tutorials, and success stories from our community of autistic entrepreneurs and career experts.</p>
+    <div class="sec-tag" id="video-tag" style="color:rgba(255,180,180,.9);">Video Library</div>
+    <h1 id="video-hero-title">Learn From Autistic Professionals</h1>
+    <p id="video-hero-body">Watch talks, tutorials, and success stories from our community of autistic entrepreneurs and career experts.</p>
     <div class="filter-row" id="video-filter-row"></div>
   </div>
   <div class="vid-section"><div class="container"><div class="vid-grid" id="vid-grid"></div></div></div>
-  <footer>&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
+  <footer class="site-footer">&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
 </div>
 
 <!-- DONATE -->
 <div id="page-donate" class="page">
   <div class="page-hero">
-    <div class="sec-tag" style="color:rgba(255,180,180,.9);">Support Our Mission</div>
-    <h1>Make a Difference Today</h1>
-    <p>Your donation helps autistic individuals build meaningful careers and access the resources they need to thrive.</p>
+    <div class="sec-tag" id="donate-tag" style="color:rgba(255,180,180,.9);">Support Our Mission</div>
+    <h1 id="donate-hero-title">Make a Difference Today</h1>
+    <p id="donate-hero-body">Your donation helps autistic individuals build meaningful careers and access the resources they need to thrive.</p>
   </div>
   <div class="donate-section">
     <div class="donate-grid">
       <div class="donate-why">
-        <h3>Why your gift matters</h3>
-        <p>Every contribution directly supports autistic individuals on their career journey, funding free resources, mentorship connections, and video-based learning.</p>
+        <h3 id="donate-why-title">Why your gift matters</h3>
+        <p id="donate-why-body">Every contribution directly supports autistic individuals on their career journey.</p>
         <div class="impact-list">
-          <div class="impact-item"><div class="impact-check">&#10003;</div><p><strong>$10</strong> provides one month of access to our CAPABL career assessment tool</p></div>
-          <div class="impact-item"><div class="impact-check">&#10003;</div><p><strong>$25</strong> sponsors a mentorship session between an autistic professional and a young job-seeker</p></div>
-          <div class="impact-item"><div class="impact-check">&#10003;</div><p><strong>$50</strong> funds production of one new video lesson from an autistic expert</p></div>
-          <div class="impact-item"><div class="impact-check">&#10003;</div><p><strong>$100</strong> supports a full month of platform operations and community events</p></div>
+          <div class="impact-item"><div class="impact-check">&#10003;</div><p id="donate-impact1"><strong>$10</strong> provides one month of access to our CAPABL career assessment tool</p></div>
+          <div class="impact-item"><div class="impact-check">&#10003;</div><p id="donate-impact2"><strong>$25</strong> sponsors a mentorship session between an autistic professional and a young job-seeker</p></div>
+          <div class="impact-item"><div class="impact-check">&#10003;</div><p id="donate-impact3"><strong>$50</strong> funds production of one new video lesson from an autistic expert</p></div>
+          <div class="impact-item"><div class="impact-check">&#10003;</div><p id="donate-impact4"><strong>$100</strong> supports a full month of platform operations and community events</p></div>
         </div>
       </div>
       <div class="donate-form-wrap">
@@ -545,11 +558,112 @@ footer{background:var(--maroon);padding:2rem;text-align:center;font-size:13px;co
       </div>
     </div>
   </div>
-  <footer>&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
+  <footer class="site-footer">&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
 </div>
 
 <script>
-// ── CONFIG ───────────────────────────────────
+// ── DEFAULT CONTENT ──────────────────────────
+// All editable text lives here. Admin overwrites this via localStorage.
+var DEFAULT_CONTENT = {
+  // NAV
+  nav_donate_btn: 'Donate Here',
+
+  // HOME - HERO
+  hero_eyebrow: 'Autistic-Led & Community-Driven',
+  hero_h1_line1: 'Build',
+  hero_h1_emphasis: 'WORK',
+  hero_h1_line2: 'that works for you!',
+  hero_body: 'Career assessment, mentorship, and entrepreneurial skill building for autistic professionals and business owners.',
+  hero_btn_primary: 'Get Started',
+  hero_btn_secondary: 'Watch Videos',
+  hero_quote: '"Autism Career Pathways gave me the tools to turn my passion into a real career path." — Community Member',
+  hero_stat1_num: '500+', hero_stat1_label: 'Members supported',
+  hero_stat2_num: '100%', hero_stat2_label: 'Autistic-led',
+  hero_stat3_num: 'Free',  hero_stat3_label: 'Resources & courses',
+  hero_stat4_num: '3+',   hero_stat4_label: 'Active programs',
+
+  // HOME - CAROUSEL
+  carousel_tag: 'Our Community',
+  carousel_title: 'Career Paths & Success Stories',
+  carousel_body: 'Celebrating the professional achievements and entrepreneurial spirit of our autistic role models.',
+
+  // HOME - MISSION
+  mission_tag: 'Our Mission',
+  mission_title: 'Empowering autistic individuals to build meaningful careers',
+  mission_p1: 'Autism Career Pathways is a nonprofit organization dedicated to empowering autistic individuals of all ages to build meaningful and sustainable career pathways. We provide autistic-led resources, mentorship, and video-based learning created by autistic entrepreneurs and professionals.',
+  mission_p2: 'Our evolving platform encourages community leaders to share knowledge and cultivate a supportive network that champions autistic-owned businesses and inclusive employment.',
+  mission_p3: 'Together, we are building a more inclusive future for the next generation of autistic individuals.',
+  mission_v1_title: 'Autistic-Led',     mission_v1_body: 'Resources created by autistic professionals who understand the journey firsthand.',
+  mission_v2_title: 'Community-Driven', mission_v2_body: 'A supportive network that champions autistic-owned businesses and inclusive employment.',
+  mission_v3_title: 'Future-Focused',   mission_v3_body: 'Building sustainable pathways for the next generation of autistic entrepreneurs.',
+
+  // HOME - PROGRAMS PREVIEW
+  programs_tag: 'What We Offer',
+  programs_title: 'Empowering autistic people to turn interests & unique skills into meaningful careers',
+  programs_body: 'Three pathways designed to meet you where you are and take you where you want to go.',
+  prog_prev1_title: 'Career Assessment',       prog_prev1_body: 'The CAPABL tool helps you find your strengths, interests, and learning styles to map out your career path.',
+  prog_prev2_title: 'Online Courses',          prog_prev2_body: 'Find online courses led by autistic professionals helping parents and young adults develop skills and plan for future careers.',
+  prog_prev3_title: 'Professional Mentorship', prog_prev3_body: 'Get advice from autistic mentors and business owners. Learn how to grow your career and balance work with your personal life.',
+
+  // HOME - CONTACT
+  contact_tag: 'Connect With Us',
+  contact_title: 'Start Your Career Journey',
+  contact_body: 'Connect with our team for resources, mentorship, and guidance tailored to your goals.',
+  contact_email: 'maisie@acpworks.org',
+  contact_phone: '(650) 483-7174',
+  contact_fb:  'https://www.facebook.com/autismcareerpathways/',
+  contact_ig:  'https://www.instagram.com/autismcareerpathways/',
+  contact_yt:  'http://www.youtube.com/@autismcareerpathways',
+  contact_x:   'https://x.com/autisticcareers',
+  contact_li:  'http://www.linkedin.com/in/maisie-soetantyo',
+
+  // ABOUT PAGE
+  about_tag: 'Who We Are',
+  about_hero_title: 'About Us',
+  about_hero_body: 'Learn about our mission, our team, and the community we are building together.',
+  about_story_title: 'Our Story',
+  about_p1: 'Autism Career Pathways is a nonprofit organization dedicated to empowering autistic individuals of all ages to build meaningful and sustainable career pathways.',
+  about_p2: 'We provide autistic-led resources, mentorship, and video-based learning created by autistic entrepreneurs and professionals. Our evolving platform encourages community leaders to share knowledge and cultivate a supportive network.',
+  about_p3: 'Together, we are building a more inclusive future for the next generation of autistic individuals.',
+
+  // TRAINING PAGE
+  training_tag: 'Learn & Grow',
+  training_hero_title: 'Training',
+  training_hero_body: 'Join our upcoming workshops, webinars, and training sessions led by autistic professionals.',
+
+  // RESOURCES PAGE
+  resources_tag: 'Tools & Guides',
+  resources_hero_title: 'Resources',
+  resources_hero_body: 'Free tools, guides, and resources curated for autistic individuals and their supporters.',
+  res_aw_tag: 'Community', res_aw_title: 'Autistically Wired', res_aw_body: 'Resources, stories, and tools created by and for the autistic community.',
+  res_cb_tag: 'Directory', res_cb_title: 'Certified Businesses', res_cb_body: 'Autistic-owned and neurodivergent-friendly certified businesses in our network.',
+  res_ar_tag: 'More Resources', res_ar_title: 'Additional Resources', res_ar_body: 'Guides, tools, templates, and external links to support your career journey.',
+
+  // PROGRAMS PAGE
+  programs_page_tag: 'Career Pathways',
+  programs_page_hero_title: 'Programs',
+  programs_page_hero_body: 'Explore our free programs designed to build skills, confidence, and career momentum.',
+
+  // VIDEOS PAGE
+  video_tag: 'Video Library',
+  video_hero_title: 'Learn From Autistic Professionals',
+  video_hero_body: 'Watch talks, tutorials, and success stories from our community of autistic entrepreneurs and career experts.',
+
+  // DONATE PAGE
+  donate_tag: 'Support Our Mission',
+  donate_hero_title: 'Make a Difference Today',
+  donate_hero_body: 'Your donation helps autistic individuals build meaningful careers and access the resources they need to thrive.',
+  donate_why_title: 'Why your gift matters',
+  donate_why_body: 'Every contribution directly supports autistic individuals on their career journey, funding free resources, mentorship connections, and video-based learning.',
+  donate_impact1: '$10 provides one month of access to our CAPABL career assessment tool',
+  donate_impact2: '$25 sponsors a mentorship session between an autistic professional and a young job-seeker',
+  donate_impact3: '$50 funds production of one new video lesson from an autistic expert',
+  donate_impact4: '$100 supports a full month of platform operations and community events',
+
+  // FOOTER
+  footer_text: '© 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.'
+};
+
 var CAT_LABELS = {
   career: 'Career Tips',
   entrepreneurship: 'Entrepreneurship',
@@ -557,31 +671,14 @@ var CAT_LABELS = {
   success: 'Success Stories'
 };
 
-// ── NETLIFY BLOBS API ────────────────────────
-// Site ID and token are stored in localStorage by the admin panel
-var SITE_ID = '';
-var BLOB_TOKEN = '';
-
-function blobsGet(key, def, callback) {
-  var sid   = localStorage.getItem('acp-site-id')   || SITE_ID;
-  var token = localStorage.getItem('acp-blob-token') || BLOB_TOKEN;
-  if (!sid || !token) { callback(def); return; }
-  fetch('https://api.netlify.com/api/v1/sites/' + sid + '/blobs/' + encodeURIComponent(key) + '?store=acp-site-data', {
-    headers: { 'Authorization': 'Bearer ' + token }
-  })
-    .then(function(r) {
-      if (r.status === 404) { callback(def); return null; }
-      return r.text();
-    })
-    .then(function(t) {
-      if (t === null) return;
-      try { callback(JSON.parse(t)); }
-      catch(e) { callback(t || def); }
-    })
-    .catch(function() { callback(def); });
+// ── STORAGE ──────────────────────────────────
+function load(key, def) {
+  try { var r = localStorage.getItem(key); return r ? JSON.parse(r) : def; }
+  catch(e) { return def; }
 }
 
 // ── STATE ────────────────────────────────────
+var C = {};  // content object
 var videos   = [];
 var photos   = [];
 var events   = [];
@@ -595,32 +692,130 @@ var selectedAmt = 25;
 
 // ── INIT ─────────────────────────────────────
 function init() {
-  var keys = [
-    ['acp-videos',   defaultVideos(),   function(v){ videos=v; }],
-    ['acp-photos',   [],                function(v){ photos=v; }],
-    ['acp-events',   defaultEvents(),   function(v){ events=v; }],
-    ['acp-res-aw',   defaultResAW(),    function(v){ resAW=v; }],
-    ['acp-res-cb',   defaultResCB(),    function(v){ resCB=v; }],
-    ['acp-res-ar',   defaultResAR(),    function(v){ resAR=v; }],
-    ['acp-programs', defaultPrograms(), function(v){ programs=v; }]
-  ];
-  var loaded = 0;
+  // Merge saved content over defaults
+  var saved = load('acp-content', {});
+  C = {};
+  var keys = Object.keys(DEFAULT_CONTENT);
   for (var i = 0; i < keys.length; i++) {
-    (function(k, def, setter) {
-      blobsGet(k, def, function(val) {
-        setter(val);
-        loaded++;
-        if (loaded === keys.length) {
-          renderCarousel();
-          renderFilterPills();
-          renderVideos('all');
-          renderPageList('events');
-          renderPageList('programs');
-          renderResourceSections();
-        }
-      });
-    })(keys[i][0], keys[i][1], keys[i][2]);
+    C[keys[i]] = (saved[keys[i]] !== undefined) ? saved[keys[i]] : DEFAULT_CONTENT[keys[i]];
   }
+
+  videos   = load('acp-videos',   defaultVideos());
+  photos   = load('acp-photos',   []);
+  events   = load('acp-events',   defaultEvents());
+  resAW    = load('acp-res-aw',   defaultResAW());
+  resCB    = load('acp-res-cb',   defaultResCB());
+  resAR    = load('acp-res-ar',   defaultResAR());
+  programs = load('acp-programs', defaultPrograms());
+
+  applyContent();
+  renderCarousel();
+  renderFilterPills();
+  renderVideos('all');
+  renderPageList('events');
+  renderPageList('programs');
+  renderResourceSections();
+}
+
+// ── APPLY CONTENT TO DOM ─────────────────────
+function applyContent() {
+  function set(id, val) { var el = document.getElementById(id); if (el) el.innerHTML = val; }
+  function setTxt(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
+  function setHref(id, val) { var el = document.getElementById(id); if (el) el.href = val; }
+
+  // Hero
+  set('hero-eyebrow-text', C.hero_eyebrow);
+  set('hero-h1', 'Build <em>' + C.hero_h1_emphasis + '</em> ' + C.hero_h1_line2);
+  set('hero-body', C.hero_body);
+  setTxt('hero-btn-primary', C.hero_btn_primary);
+  setTxt('hero-btn-secondary', C.hero_btn_secondary);
+  set('hero-quote', C.hero_quote);
+  setTxt('stat1-num', C.hero_stat1_num); setTxt('stat1-label', C.hero_stat1_label);
+  setTxt('stat2-num', C.hero_stat2_num); setTxt('stat2-label', C.hero_stat2_label);
+  setTxt('stat3-num', C.hero_stat3_num); setTxt('stat3-label', C.hero_stat3_label);
+  setTxt('stat4-num', C.hero_stat4_num); setTxt('stat4-label', C.hero_stat4_label);
+
+  // Carousel section
+  setTxt('carousel-tag', C.carousel_tag);
+  setTxt('carousel-title', C.carousel_title);
+  setTxt('carousel-body', C.carousel_body);
+
+  // Mission
+  setTxt('mission-tag', C.mission_tag);
+  set('mission-title', C.mission_title);
+  set('mission-p1', C.mission_p1);
+  set('mission-p2', C.mission_p2);
+  set('mission-p3', C.mission_p3);
+  setTxt('mission-v1-title', C.mission_v1_title); setTxt('mission-v1-body', C.mission_v1_body);
+  setTxt('mission-v2-title', C.mission_v2_title); setTxt('mission-v2-body', C.mission_v2_body);
+  setTxt('mission-v3-title', C.mission_v3_title); setTxt('mission-v3-body', C.mission_v3_body);
+
+  // Programs preview
+  setTxt('programs-tag', C.programs_tag);
+  set('programs-title', C.programs_title);
+  setTxt('programs-body', C.programs_body);
+  setTxt('prog-prev1-title', C.prog_prev1_title); setTxt('prog-prev1-body', C.prog_prev1_body);
+  setTxt('prog-prev2-title', C.prog_prev2_title); setTxt('prog-prev2-body', C.prog_prev2_body);
+  setTxt('prog-prev3-title', C.prog_prev3_title); setTxt('prog-prev3-body', C.prog_prev3_body);
+
+  // Contact
+  setTxt('contact-tag', C.contact_tag);
+  set('contact-title', C.contact_title);
+  setTxt('contact-body', C.contact_body);
+  setTxt('contact-email', C.contact_email);
+  setTxt('contact-phone', C.contact_phone);
+  setHref('soc-fb', C.contact_fb);
+  setHref('soc-ig', C.contact_ig);
+  setHref('soc-yt', C.contact_yt);
+  setHref('soc-x',  C.contact_x);
+  setHref('soc-li', C.contact_li);
+
+  // About
+  setTxt('about-tag', C.about_tag);
+  setTxt('about-hero-title', C.about_hero_title);
+  setTxt('about-hero-body', C.about_hero_body);
+  setTxt('about-story-title', C.about_story_title);
+  set('about-p1', C.about_p1);
+  set('about-p2', C.about_p2);
+  set('about-p3', C.about_p3);
+
+  // Training
+  setTxt('training-tag', C.training_tag);
+  setTxt('training-hero-title', C.training_hero_title);
+  setTxt('training-hero-body', C.training_hero_body);
+
+  // Resources
+  setTxt('resources-tag', C.resources_tag);
+  setTxt('resources-hero-title', C.resources_hero_title);
+  setTxt('resources-hero-body', C.resources_hero_body);
+  setTxt('res-aw-tag', C.res_aw_tag); setTxt('res-aw-title', C.res_aw_title); setTxt('res-aw-body', C.res_aw_body);
+  setTxt('res-cb-tag', C.res_cb_tag); setTxt('res-cb-title', C.res_cb_title); setTxt('res-cb-body', C.res_cb_body);
+  setTxt('res-ar-tag', C.res_ar_tag); setTxt('res-ar-title', C.res_ar_title); setTxt('res-ar-body', C.res_ar_body);
+
+  // Programs page
+  setTxt('programs-page-tag', C.programs_page_tag);
+  setTxt('programs-page-hero-title', C.programs_page_hero_title);
+  setTxt('programs-page-hero-body', C.programs_page_hero_body);
+
+  // Videos page
+  setTxt('video-tag', C.video_tag);
+  setTxt('video-hero-title', C.video_hero_title);
+  setTxt('video-hero-body', C.video_hero_body);
+
+  // Donate page
+  setTxt('donate-tag', C.donate_tag);
+  setTxt('donate-hero-title', C.donate_hero_title);
+  setTxt('donate-hero-body', C.donate_hero_body);
+  setTxt('donate-why-title', C.donate_why_title);
+  setTxt('donate-why-body', C.donate_why_body);
+  set('donate-impact1', '<strong>' + C.donate_impact1.split(' ')[0] + '</strong> ' + C.donate_impact1.split(' ').slice(1).join(' '));
+  set('donate-impact2', '<strong>' + C.donate_impact2.split(' ')[0] + '</strong> ' + C.donate_impact2.split(' ').slice(1).join(' '));
+  set('donate-impact3', '<strong>' + C.donate_impact3.split(' ')[0] + '</strong> ' + C.donate_impact3.split(' ').slice(1).join(' '));
+  set('donate-impact4', '<strong>' + C.donate_impact4.split(' ')[0] + '</strong> ' + C.donate_impact4.split(' ').slice(1).join(' '));
+
+  // Footer
+  var footers = document.querySelectorAll('.site-footer');
+  for (var i = 0; i < footers.length; i++) footers[i].textContent = C.footer_text;
 }
 
 // ── NAVIGATION ───────────────────────────────
@@ -639,6 +834,42 @@ function showPage(p) {
 function scrollToAnchor(id) {
   var el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── MOBILE MENU ──────────────────────────────
+function toggleMenu() {
+  var btn = document.getElementById('ham-btn');
+  var menu = document.getElementById('mobile-menu');
+  if (!btn || !menu) return;
+  if (menu.classList.contains('open')) { closeMenu(); return; }
+  btn.classList.add('open'); menu.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMenu() {
+  var btn = document.getElementById('ham-btn');
+  var menu = document.getElementById('mobile-menu');
+  if (btn) btn.classList.remove('open');
+  if (menu) menu.classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeMenuIfBackdrop(e) {
+  if (e.target === document.getElementById('mobile-menu')) closeMenu();
+}
+function toggleMSub() {
+  var sub = document.getElementById('mobile-sub');
+  if (sub) sub.style.display = (sub.style.display === 'none') ? 'block' : 'none';
+}
+function mNav(p) {
+  showPage(p); closeMenu();
+  var ids = ['home','about','events','programs','video','donate'];
+  for (var i = 0; i < ids.length; i++) {
+    var el = document.getElementById('mnav-' + ids[i]);
+    if (el) { if (ids[i] === p) el.classList.add('active'); else el.classList.remove('active'); }
+  }
+}
+function mNavRes(anchor) {
+  showPage('resources'); closeMenu();
+  setTimeout(function(){ scrollToAnchor(anchor); }, 80);
 }
 
 // ── CAROUSEL ─────────────────────────────────
@@ -672,32 +903,27 @@ function renderCarousel() {
     carTimer = setInterval(function(){ carMove(1); }, 4000);
   }
 }
-
 function carMove(dir) {
   var n = photos.length || 1;
-  carIdx = (carIdx + dir + n) % n;
-  carUpdatePos();
+  carIdx = (carIdx + dir + n) % n; carUpdatePos();
   clearInterval(carTimer);
   if (photos.length > 1) carTimer = setInterval(function(){ carMove(1); }, 4000);
 }
-
 function goSlide(i) {
   carIdx = i; carUpdatePos();
   clearInterval(carTimer);
   if (photos.length > 1) carTimer = setInterval(function(){ carMove(1); }, 4000);
 }
-
 function carUpdatePos() {
   var t = document.getElementById('carousel-track');
   if (t) t.style.transform = 'translateX(-' + (carIdx * 100) + '%)';
   var d = document.querySelectorAll('.car-dot');
   for (var i = 0; i < d.length; i++) {
-    if (i === carIdx) d[i].classList.add('active');
-    else d[i].classList.remove('active');
+    if (i === carIdx) d[i].classList.add('active'); else d[i].classList.remove('active');
   }
 }
 
-// ── VIDEO FILTER PILLS ───────────────────────
+// ── VIDEOS ───────────────────────────────────
 function renderFilterPills() {
   var row = document.getElementById('video-filter-row');
   if (!row) return;
@@ -707,8 +933,7 @@ function renderFilterPills() {
   }
   row.innerHTML = '';
   var allBtn = document.createElement('button');
-  allBtn.className = 'fbtn active';
-  allBtn.textContent = 'All Videos';
+  allBtn.className = 'fbtn active'; allBtn.textContent = 'All Videos';
   allBtn.onclick = function() { filterVids('all', allBtn); };
   row.appendChild(allBtn);
   var cats = Object.keys(CAT_LABELS);
@@ -716,15 +941,13 @@ function renderFilterPills() {
     if (usedCats.indexOf(cats[i]) > -1) {
       (function(key) {
         var btn = document.createElement('button');
-        btn.className = 'fbtn';
-        btn.textContent = CAT_LABELS[key];
+        btn.className = 'fbtn'; btn.textContent = CAT_LABELS[key];
         btn.onclick = function() { filterVids(key, btn); };
         row.appendChild(btn);
       })(cats[i]);
     }
   }
 }
-
 function renderVideos(cat) {
   var grid = document.getElementById('vid-grid');
   if (!grid) return;
@@ -732,10 +955,8 @@ function renderVideos(cat) {
   if (!list.length) { grid.innerHTML = '<div class="vid-empty">No videos yet.</div>'; return; }
   var html = '';
   for (var i = 0; i < list.length; i++) {
-    var v = list[i];
-    var catLabel = CAT_LABELS[v.cat] || v.cat;
-    html += '<div class="vcard">';
-    html += '<div class="vthumb" data-url="' + v.url + '" onclick="playVid(this)">';
+    var v = list[i]; var catLabel = CAT_LABELS[v.cat] || v.cat;
+    html += '<div class="vcard"><div class="vthumb" data-url="' + v.url + '" onclick="playVid(this)">';
     html += '<img src="https://img.youtube.com/vi/' + v.url + '/mqdefault.jpg" onerror="this.style.opacity=0" alt="">';
     html += '<div class="vthumb-overlay"><div class="play-circle"><svg width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div></div>';
     html += '<span class="vcatbadge">' + catLabel + '</span></div>';
@@ -744,13 +965,10 @@ function renderVideos(cat) {
   }
   grid.innerHTML = html;
 }
-
 function playVid(el) {
-  var id = el.getAttribute('data-url');
-  el.style.position = 'relative';
+  var id = el.getAttribute('data-url'); el.style.position = 'relative';
   el.innerHTML = '<iframe src="https://www.youtube.com/embed/' + id + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>';
 }
-
 function filterVids(cat, btn) {
   var btns = document.querySelectorAll('.fbtn');
   for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
@@ -758,12 +976,12 @@ function filterVids(cat, btn) {
   renderVideos(cat);
 }
 
+// ── PAGE LISTS ───────────────────────────────
 function renderPageList(type) {
   var arr = (type === 'events') ? events : programs;
   var el  = document.getElementById(type + '-list');
-  var icon = (type === 'events') ? '&#128197;' : '&#127891;';
   if (!el) return;
-  if (!arr.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">' + icon + '</div><p>Nothing here yet.</p></div>'; return; }
+  if (!arr.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">' + (type==='events'?'&#128197;':'&#127891;') + '</div><p>Nothing here yet.</p></div>'; return; }
   var html = '';
   for (var i = 0; i < arr.length; i++) {
     var item = arr[i];
@@ -775,16 +993,13 @@ function renderPageList(type) {
   }
   el.innerHTML = html;
 }
-
 function renderResourceSections() {
   renderOneResList(resAW, 'resources-list-autistically-wired');
   renderOneResList(resCB, 'resources-list-certified-businesses');
   renderOneResList(resAR, 'resources-list-additional-resources');
 }
-
 function renderOneResList(arr, elId) {
-  var el = document.getElementById(elId);
-  if (!el) return;
+  var el = document.getElementById(elId); if (!el) return;
   if (!arr.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128203;</div><p>Nothing here yet.</p></div>'; return; }
   var html = '';
   for (var i = 0; i < arr.length; i++) {
@@ -797,17 +1012,15 @@ function renderOneResList(arr, elId) {
   el.innerHTML = html;
 }
 
+// ── DONATE ───────────────────────────────────
 function selAmt(a, btn) {
   selectedAmt = a;
   var btns = document.querySelectorAll('.amount-btn');
   for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
   btn.classList.add('selected');
-  var inp = document.getElementById('custom-amount');
-  if (inp) inp.value = '';
-  var disp = document.getElementById('donate-amt-display');
-  if (disp) disp.textContent = '$' + a;
+  var inp = document.getElementById('custom-amount'); if (inp) inp.value = '';
+  var disp = document.getElementById('donate-amt-display'); if (disp) disp.textContent = '$' + a;
 }
-
 function clearAmtBtns() {
   var btns = document.querySelectorAll('.amount-btn');
   for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
@@ -817,57 +1030,18 @@ function clearAmtBtns() {
   var disp = document.getElementById('donate-amt-display');
   if (disp) disp.textContent = val ? '$' + Math.round(parseFloat(val)) : '';
 }
-
 function selFreq(btn) {
   var btns = document.querySelectorAll('.dfreq-btn');
   for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
   btn.classList.add('selected');
 }
-
 function handleDonate() {
   var inp = document.getElementById('custom-amount');
   var amt = (inp && inp.value) ? parseFloat(inp.value) : selectedAmt;
   if (!amt || amt < 1) { alert('Please select or enter a donation amount.'); return; }
-  blobsGet('acp-stripe-link', '', function(link) {
-    if (!link) { alert('Stripe not yet configured. Contact the site admin.'); return; }
-    window.open(link + '?prefilled_amount=' + Math.round(amt * 100), '_blank');
-  });
-}
-
-// ── MOBILE MENU ──────────────────────────────
-function toggleMenu() {
-  var btn  = document.getElementById('ham-btn');
-  var menu = document.getElementById('mobile-menu');
-  if (!btn || !menu) return;
-  if (menu.classList.contains('open')) { closeMenu(); return; }
-  btn.classList.add('open'); menu.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeMenu() {
-  var btn  = document.getElementById('ham-btn');
-  var menu = document.getElementById('mobile-menu');
-  if (btn)  btn.classList.remove('open');
-  if (menu) menu.classList.remove('open');
-  document.body.style.overflow = '';
-}
-function closeMenuIfBackdrop(e) {
-  if (e.target === document.getElementById('mobile-menu')) closeMenu();
-}
-function toggleMSub() {
-  var sub = document.getElementById('mobile-sub');
-  if (sub) sub.style.display = (sub.style.display === 'none') ? 'block' : 'none';
-}
-function mNav(p) {
-  showPage(p); closeMenu();
-  var ids = ['home','about','events','programs','video','donate'];
-  for (var i = 0; i < ids.length; i++) {
-    var el = document.getElementById('mnav-' + ids[i]);
-    if (el) { if (ids[i]===p) el.classList.add('active'); else el.classList.remove('active'); }
-  }
-}
-function mNavRes(anchor) {
-  showPage('resources'); closeMenu();
-  setTimeout(function(){ scrollToAnchor(anchor); }, 80);
+  var link = load('acp-stripe-link', '');
+  if (!link) { alert('Stripe not yet configured. Contact the site admin.'); return; }
+  window.open(link + '?prefilled_amount=' + Math.round(amt * 100), '_blank');
 }
 
 // ── DEFAULT DATA ─────────────────────────────
