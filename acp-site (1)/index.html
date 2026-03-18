@@ -557,16 +557,28 @@ var CAT_LABELS = {
   success: 'Success Stories'
 };
 
-// ── API ──────────────────────────────────────
-function apiGet(key, def, callback) {
-  fetch('/.netlify/functions/get-data?key=' + encodeURIComponent(key))
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      if (d.value === null || d.value === undefined) { callback(def); return; }
-      try { callback(JSON.parse(d.value)); }
-      catch(e) { callback(d.value || def); }
+// ── NETLIFY BLOBS API ────────────────────────
+// Site ID and token are stored in localStorage by the admin panel
+var SITE_ID = '';
+var BLOB_TOKEN = '';
+
+function blobsGet(key, def, callback) {
+  var sid   = localStorage.getItem('acp-site-id')   || SITE_ID;
+  var token = localStorage.getItem('acp-blob-token') || BLOB_TOKEN;
+  if (!sid || !token) { callback(def); return; }
+  fetch('https://api.netlify.com/api/v1/sites/' + sid + '/blobs/' + encodeURIComponent(key) + '?store=acp-site-data', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+    .then(function(r) {
+      if (r.status === 404) { callback(def); return null; }
+      return r.text();
     })
-    .catch(function(){ callback(def); });
+    .then(function(t) {
+      if (t === null) return;
+      try { callback(JSON.parse(t)); }
+      catch(e) { callback(t || def); }
+    })
+    .catch(function() { callback(def); });
 }
 
 // ── STATE ────────────────────────────────────
@@ -595,7 +607,7 @@ function init() {
   var loaded = 0;
   for (var i = 0; i < keys.length; i++) {
     (function(k, def, setter) {
-      apiGet(k, def, function(val) {
+      blobsGet(k, def, function(val) {
         setter(val);
         loaded++;
         if (loaded === keys.length) {
@@ -654,8 +666,7 @@ function renderCarousel() {
     }
   }
   dots.innerHTML = dotHtml;
-  carIdx = 0;
-  carUpdatePos();
+  carIdx = 0; carUpdatePos();
   clearInterval(carTimer);
   if (slides.length > 1 && !slides[0].placeholder) {
     carTimer = setInterval(function(){ carMove(1); }, 4000);
@@ -671,8 +682,7 @@ function carMove(dir) {
 }
 
 function goSlide(i) {
-  carIdx = i;
-  carUpdatePos();
+  carIdx = i; carUpdatePos();
   clearInterval(carTimer);
   if (photos.length > 1) carTimer = setInterval(function(){ carMove(1); }, 4000);
 }
@@ -715,7 +725,6 @@ function renderFilterPills() {
   }
 }
 
-// ── VIDEO GRID ───────────────────────────────
 function renderVideos(cat) {
   var grid = document.getElementById('vid-grid');
   if (!grid) return;
@@ -749,16 +758,12 @@ function filterVids(cat, btn) {
   renderVideos(cat);
 }
 
-// ── PAGE LISTS ───────────────────────────────
 function renderPageList(type) {
   var arr = (type === 'events') ? events : programs;
   var el  = document.getElementById(type + '-list');
   var icon = (type === 'events') ? '&#128197;' : '&#127891;';
   if (!el) return;
-  if (!arr.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">' + icon + '</div><p>Nothing here yet.</p></div>';
-    return;
-  }
+  if (!arr.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">' + icon + '</div><p>Nothing here yet.</p></div>'; return; }
   var html = '';
   for (var i = 0; i < arr.length; i++) {
     var item = arr[i];
@@ -792,7 +797,6 @@ function renderOneResList(arr, elId) {
   el.innerHTML = html;
 }
 
-// ── DONATE ───────────────────────────────────
 function selAmt(a, btn) {
   selectedAmt = a;
   var btns = document.querySelectorAll('.amount-btn');
@@ -824,7 +828,7 @@ function handleDonate() {
   var inp = document.getElementById('custom-amount');
   var amt = (inp && inp.value) ? parseFloat(inp.value) : selectedAmt;
   if (!amt || amt < 1) { alert('Please select or enter a donation amount.'); return; }
-  apiGet('acp-stripe-link', '', function(link) {
+  blobsGet('acp-stripe-link', '', function(link) {
     if (!link) { alert('Stripe not yet configured. Contact the site admin.'); return; }
     window.open(link + '?prefilled_amount=' + Math.round(amt * 100), '_blank');
   });
@@ -836,8 +840,7 @@ function toggleMenu() {
   var menu = document.getElementById('mobile-menu');
   if (!btn || !menu) return;
   if (menu.classList.contains('open')) { closeMenu(); return; }
-  btn.classList.add('open');
-  menu.classList.add('open');
+  btn.classList.add('open'); menu.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 function closeMenu() {
