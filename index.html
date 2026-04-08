@@ -425,7 +425,7 @@ if (typeof BAKED !== 'undefined') {
       <div class="contact-grid">
         <div class="contact-info">
           <h3>Get In Touch</h3>
-          <div class="cinfo-row"><div class="cinfo-icon">&#9993;</div><span id="contact-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="aec3cfc7ddc7cbeecfcdded9c1dcc5dd80c1dcc9">[email&#160;protected]</a></span></div>
+          <div class="cinfo-row"><div class="cinfo-icon">&#9993;</div><span id="contact-email">maisie@acpworks.org</span></div>
           <div class="cinfo-row"><div class="cinfo-icon">&#128222;</div><span id="contact-phone">(650) 483-7174</span></div>
           <div class="socials">
             <a id="soc-fb" href="https://www.facebook.com/autismcareerpathways/" class="soc-btn" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
@@ -436,13 +436,13 @@ if (typeof BAKED !== 'undefined') {
           </div>
         </div>
         <div class="cform">
-          <div class="frow"><div class="fg"><label>First name *</label><input id="cf-first" type="text" placeholder="Jane"></div><div class="fg"><label>Last name *</label><input id="cf-last" type="text" placeholder="Smith"></div></div>
-          <div class="fg"><label>Email address *</label><input id="cf-email" type="email" placeholder="jane@example.com"></div>
-          <div class="fg"><label>Phone number</label><input id="cf-phone" type="tel" placeholder="(555) 000-0000"></div>
-          <div class="fg"><label>What are you interested in?</label><select id="cf-interest"><option value="">Select...</option><option>Online training</option><option>CAPABL career assessment</option><option>Becoming a mentor</option></select></div>
-          <div class="fg"><label>Are you autistic or a caregiver?</label><select id="cf-role"><option value="">Select...</option><option>Autistic individual</option><option>Caregiver / Parent</option><option>Professional / Ally</option></select></div>
-          <div class="fg"><label>Tell us about yourself *</label><textarea id="cf-about" placeholder="Share your background, goals, or what brings you here..."></textarea></div>
-          <button class="fsub" onclick="submitContactForm()">Submit Information</button>
+          <div class="frow"><div class="fg"><label>First name *</label><input type="text" placeholder="Jane"></div><div class="fg"><label>Last name *</label><input type="text" placeholder="Smith"></div></div>
+          <div class="fg"><label>Email address *</label><input type="email" placeholder="jane@example.com"></div>
+          <div class="fg"><label>Phone number</label><input type="tel" placeholder="(555) 000-0000"></div>
+          <div class="fg"><label>What are you interested in?</label><select><option value="">Select...</option><option>Online training</option><option>CAPABL career assessment</option><option>Becoming a mentor</option></select></div>
+          <div class="fg"><label>Are you autistic or a caregiver?</label><select><option value="">Select...</option><option>Autistic individual</option><option>Caregiver / Parent</option><option>Professional / Ally</option></select></div>
+          <div class="fg"><label>Tell us about yourself *</label><textarea placeholder="Share your background, goals, or what brings you here..."></textarea></div>
+          <button class="fsub">Submit Information</button>
         </div>
       </div>
     </div>
@@ -561,7 +561,7 @@ if (typeof BAKED !== 'undefined') {
   <footer class="site-footer">&#169; 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved.</footer>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ── DEFAULT CONTENT ──────────────────────────
 // All editable text lives here. Admin overwrites this via localStorage.
 var DEFAULT_CONTENT = {
@@ -976,37 +976,6 @@ function filterVids(cat, btn) {
   renderVideos(cat);
 }
 
-// ── CONTACT FORM ─────────────────────────────
-function submitContactForm() {
-  var first    = (document.getElementById('cf-first')    || {}).value || '';
-  var last     = (document.getElementById('cf-last')     || {}).value || '';
-  var email    = (document.getElementById('cf-email')    || {}).value || '';
-  var phone    = (document.getElementById('cf-phone')    || {}).value || '';
-  var interest = (document.getElementById('cf-interest') || {}).value || '';
-  var role     = (document.getElementById('cf-role')     || {}).value || '';
-  var about    = (document.getElementById('cf-about')    || {}).value || '';
-
-  if (!first || !last || !email || !about) {
-    alert('Please fill in the required fields: First name, Last name, Email address, and Tell us about yourself.');
-    return;
-  }
-
-  var body =
-    'First name: ' + first + '\n' +
-    'Last name: ' + last + '\n' +
-    'Email address: ' + email + '\n' +
-    'Phone number: ' + (phone || '(not provided)') + '\n' +
-    'What are you interested in: ' + (interest || '(not selected)') + '\n' +
-    'Are you autistic or a caregiver: ' + (role || '(not selected)') + '\n' +
-    'Tell us about yourself: ' + about;
-
-  var mailto = 'mailto:maisie@acpworks.org' +
-    '?subject=' + encodeURIComponent('ACP Form Submission') +
-    '&body=' + encodeURIComponent(body);
-
-  window.location.href = mailto;
-}
-
 // ── PAGE LISTS ───────────────────────────────
 function renderPageList(type) {
   var arr = (type === 'events') ? events : programs;
@@ -1100,4 +1069,13 @@ function defaultResAR() {
 function defaultPrograms() {
   return [
     { id:1, title:'Exploring and Leveraging Autistic Interests', link:'', desc:'Learn how to channel your autistic interests into meaningful career opportunities.' },
-    { id:2, title:'Autism and Career: Your Path Forward', link:'', desc:'A structured program to help you define your career goals.' 
+    { id:2, title:'Autism and Career: Your Path Forward', link:'', desc:'A structured program to help you define your career goals.' },
+    { id:3, title:'Building a Successful Career: Strategies for Individuals with Autism', link:'', desc:'Evidence-based strategies for navigating the modern workplace.' }
+  ];
+}
+
+window.onload = init;
+
+</script>
+</body>
+</html>
