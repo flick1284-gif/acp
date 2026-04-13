@@ -436,13 +436,26 @@ if (typeof BAKED !== 'undefined') {
           </div>
         </div>
         <div class="cform">
-          <div class="frow"><div class="fg"><label>First name *</label><input type="text" placeholder="Jane"></div><div class="fg"><label>Last name *</label><input type="text" placeholder="Smith"></div></div>
-          <div class="fg"><label>Email address *</label><input type="email" placeholder="jane@example.com"></div>
-          <div class="fg"><label>Phone number</label><input type="tel" placeholder="(555) 000-0000"></div>
-          <div class="fg"><label>What are you interested in?</label><select><option value="">Select...</option><option>Online training</option><option>CAPABL career assessment</option><option>Becoming a mentor</option></select></div>
-          <div class="fg"><label>Are you autistic or a caregiver?</label><select><option value="">Select...</option><option>Autistic individual</option><option>Caregiver / Parent</option><option>Professional / Ally</option></select></div>
-          <div class="fg"><label>Tell us about yourself *</label><textarea placeholder="Share your background, goals, or what brings you here..."></textarea></div>
-          <button class="fsub">Submit Information</button>
+          <!-- Web3Forms: replace YOUR_ACCESS_KEY_HERE with the key from https://web3forms.com (free, tied to maisie@acpworks.org) -->
+          <form id="contact-form" onsubmit="handleContact(event)">
+            <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+            <input type="hidden" name="subject" value="ACP form submission">
+            <input type="hidden" name="from_name" value="Autism Career Pathways Website">
+            <input type="hidden" name="redirect" value="false">
+            <!-- Honeypot spam protection -->
+            <input type="checkbox" name="botcheck" style="display:none;">
+            <div class="frow">
+              <div class="fg"><label for="cf-firstname">First name *</label><input id="cf-firstname" name="First Name" type="text" placeholder="Jane" required></div>
+              <div class="fg"><label for="cf-lastname">Last name *</label><input id="cf-lastname" name="Last Name" type="text" placeholder="Smith" required></div>
+            </div>
+            <div class="fg"><label for="cf-email">Email address *</label><input id="cf-email" name="Email" type="email" placeholder="jane@example.com" required></div>
+            <div class="fg"><label for="cf-phone">Phone number</label><input id="cf-phone" name="Phone Number" type="tel" placeholder="(555) 000-0000"></div>
+            <div class="fg"><label for="cf-interest">What are you interested in?</label><select id="cf-interest" name="Interested In"><option value="">Select...</option><option>Online training</option><option>CAPABL career assessment</option><option>Becoming a mentor</option></select></div>
+            <div class="fg"><label for="cf-identity">Are you autistic or a caregiver?</label><select id="cf-identity" name="Identity"><option value="">Select...</option><option>Autistic individual</option><option>Caregiver / Parent</option><option>Professional / Ally</option></select></div>
+            <div class="fg"><label for="cf-about">Tell us about yourself *</label><textarea id="cf-about" name="About" placeholder="Share your background, goals, or what brings you here..." required></textarea></div>
+            <div id="cf-result" style="display:none;margin-bottom:1rem;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:600;"></div>
+            <button type="submit" class="fsub" id="cf-submit">Submit Information</button>
+          </form>
         </div>
       </div>
     </div>
@@ -550,8 +563,8 @@ if (typeof BAKED !== 'undefined') {
           <button class="dfreq-btn" onclick="selFreq(this)">Monthly</button>
           <button class="dfreq-btn" onclick="selFreq(this)">Yearly</button>
         </div>
-        <div class="dfrow"><div class="dfg"><label>First name *</label><input type="text" placeholder="Jane"></div><div class="dfg"><label>Last name *</label><input type="text" placeholder="Smith"></div></div>
-        <div class="dfg"><label>Email address *</label><input type="email" placeholder="jane@example.com"></div>
+        <div class="dfrow"><div class="dfg"><label for="df-firstname">First name *</label><input id="df-firstname" type="text" placeholder="Jane"></div><div class="dfg"><label for="df-lastname">Last name *</label><input id="df-lastname" type="text" placeholder="Smith"></div></div>
+        <div class="dfg"><label for="df-email">Email address *</label><input id="df-email" type="email" placeholder="jane@example.com"></div>
         <div class="stripe-note"><span class="stripe-badge">stripe</span>Secure payment processed by Stripe</div>
         <button class="donate-submit" onclick="handleDonate()">Donate <span id="donate-amt-display">$25</span></button>
 
@@ -725,7 +738,7 @@ function applyContent() {
 
   // Hero
   set('hero-eyebrow-text', C.hero_eyebrow);
-  set('hero-h1', 'Build <em>' + C.hero_h1_emphasis + '</em> ' + C.hero_h1_line2);
+  set('hero-h1', C.hero_h1_line1 + ' <em>' + C.hero_h1_emphasis + '</em> ' + C.hero_h1_line2);
   set('hero-body', C.hero_body);
   setTxt('hero-btn-primary', C.hero_btn_primary);
   setTxt('hero-btn-secondary', C.hero_btn_secondary);
@@ -1010,6 +1023,53 @@ function renderOneResList(arr, elId) {
     html += '</div>';
   }
   el.innerHTML = html;
+}
+
+// ── CONTACT FORM (Web3Forms) ──────────────────
+function handleContact(e) {
+  e.preventDefault();
+  var form    = document.getElementById('contact-form');
+  var btn     = document.getElementById('cf-submit');
+  var result  = document.getElementById('cf-result');
+
+  // Check access key has been set
+  var key = form.querySelector('[name="access_key"]').value;
+  if (!key || key === 'YOUR_ACCESS_KEY_HERE') {
+    result.style.display = 'block';
+    result.style.background = '#fff8e6';
+    result.style.color = '#92400e';
+    result.textContent = '⚠ Form not yet activated. Add your Web3Forms access key (see setup note in the code).';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  result.style.display = 'none';
+
+  var data = new FormData(form);
+  fetch('https://api.web3forms.com/submit', { method: 'POST', body: data })
+    .then(function(res) { return res.json(); })
+    .then(function(json) {
+      if (json.success) {
+        result.style.display = 'block';
+        result.style.background = 'rgba(255,255,255,0.12)';
+        result.style.color = '#86efac';
+        result.textContent = '✓ Message sent! We\'ll be in touch soon.';
+        form.reset();
+      } else {
+        throw new Error(json.message || 'Submission failed');
+      }
+    })
+    .catch(function(err) {
+      result.style.display = 'block';
+      result.style.background = 'rgba(239,68,68,0.15)';
+      result.style.color = '#fca5a5';
+      result.textContent = '✗ Something went wrong. Please email us directly at maisie@acpworks.org';
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.textContent = 'Submit Information';
+    });
 }
 
 // ── DONATE ───────────────────────────────────
