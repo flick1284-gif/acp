@@ -147,7 +147,7 @@ footer{background:var(--maroon);padding:2rem;text-align:center;font-size:13px;co
 .amount-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-bottom:1rem;}
 .amount-btn{background:var(--off-white);border:2px solid var(--border);border-radius:10px;padding:10px 6px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--text);transition:all .15s;text-align:center;}
 .amount-btn:hover{border-color:var(--maroon);color:var(--maroon);}
-.amount-btn.selected{background:var(--maroon-light);border-color:var(--maroon);color:var(--maroon);}
+.amount-btn.selected{background:var(--maroon);border-color:var(--maroon);color:#ffffff;}
 .custom-input-wrap{margin-bottom:1.25rem;}
 .custom-input-wrap label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:6px;}
 .custom-input-row{display:flex;border:2px solid var(--border);border-radius:10px;overflow:hidden;transition:border .2s;}
@@ -156,12 +156,14 @@ footer{background:var(--maroon);padding:2rem;text-align:center;font-size:13px;co
 .custom-input-row input{flex:1;border:none;padding:10px 13px;font-size:15px;font-weight:700;font-family:'Nunito',sans-serif;outline:none;color:var(--text);}
 .dfreq-row{display:flex;gap:.65rem;margin-bottom:1.5rem;}
 .dfreq-btn{flex:1;background:var(--off-white);border:2px solid var(--border);border-radius:10px;padding:9px 6px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--muted);transition:all .15s;}
-.dfreq-btn:hover,.dfreq-btn.selected{background:var(--maroon-light);border-color:var(--maroon);color:var(--maroon);}
+.dfreq-btn:hover{border-color:var(--maroon);color:var(--maroon);}
+.dfreq-btn.selected{background:var(--maroon);border-color:var(--maroon);color:#ffffff;}
 .dfg{margin-bottom:1rem;}
 .dfg label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:6px;}
 .dfg input{width:100%;border:2px solid var(--border);border-radius:10px;padding:10px 13px;font-size:14px;font-family:'Nunito',sans-serif;outline:none;transition:border .2s;color:var(--text);}
 .dfg input:focus{border-color:var(--maroon);}
 .dfrow{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.donate-onetime-note{background:#fff8e6;border:1px solid #fcd34d;border-radius:10px;padding:.75rem 1rem;font-size:13px;color:#92400e;line-height:1.6;margin-bottom:1.25rem;display:none;}
 .stripe-note{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:1rem;margin-bottom:1.25rem;}
 .stripe-badge{background:#635bff;color:white;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;}
 .stripe-setup-note{background:#fff8e6;border:1px solid #fcd34d;border-radius:10px;padding:1rem 1.25rem;font-size:13px;color:#92400e;line-height:1.6;margin-top:1.25rem;}
@@ -550,23 +552,21 @@ if (typeof BAKED !== 'undefined') {
         <h3>Choose your gift</h3>
         <div class="amount-grid">
           <button class="amount-btn" onclick="selAmt(10,this)">$10</button>
-          <button class="amount-btn selected" onclick="selAmt(25,this)">$25</button>
+          <button class="amount-btn" onclick="selAmt(25,this)">$25</button>
           <button class="amount-btn" onclick="selAmt(50,this)">$50</button>
           <button class="amount-btn" onclick="selAmt(100,this)">$100</button>
+        </div>
+        <div class="dfreq-row" id="freq-row">
+          <button class="dfreq-btn" onclick="selFreq(this)">One-time</button>
+          <button class="dfreq-btn" onclick="selFreq(this)">Monthly</button>
         </div>
         <div class="custom-input-wrap">
           <label>Or enter a custom amount</label>
           <div class="custom-input-row"><span class="dollar-sign">$</span><input type="number" id="custom-amount" placeholder="Other amount" min="1" oninput="clearAmtBtns()"></div>
         </div>
-        <div class="dfreq-row">
-          <button class="dfreq-btn selected" onclick="selFreq(this)">One-time</button>
-          <button class="dfreq-btn" onclick="selFreq(this)">Monthly</button>
-          <button class="dfreq-btn" onclick="selFreq(this)">Yearly</button>
-        </div>
-        <div class="dfrow"><div class="dfg"><label for="df-firstname">First name *</label><input id="df-firstname" type="text" placeholder="Jane"></div><div class="dfg"><label for="df-lastname">Last name *</label><input id="df-lastname" type="text" placeholder="Smith"></div></div>
-        <div class="dfg"><label for="df-email">Email address *</label><input id="df-email" type="email" placeholder="jane@example.com"></div>
+        <div class="donate-onetime-note" id="donate-onetime-note">&#9432; Custom amounts are processed as a <strong>one-time</strong> gift. Choose $10, $25, $50, or $100 above to set up a recurring donation.</div>
         <div class="stripe-note"><span class="stripe-badge">stripe</span>Secure payment processed by Stripe</div>
-        <button class="donate-submit" onclick="handleDonate()">Donate <span id="donate-amt-display">$25</span></button>
+        <button class="donate-submit" onclick="handleDonate()" id="donate-submit-btn">Donate</button>
 
       </div>
     </div>
@@ -701,7 +701,7 @@ var resAR    = [];
 var programs = [];
 var carIdx   = 0;
 var carTimer = null;
-var selectedAmt = 25;
+var selectedAmt = 0;
 
 // ── INIT ─────────────────────────────────────
 function init() {
@@ -1073,35 +1073,76 @@ function handleContact(e) {
 }
 
 // ── DONATE ───────────────────────────────────
+var STRIPE_LINKS = {
+  onetime: 'https://buy.stripe.com/dRmcN6gxUf5k3pcawfcwg01',
+  monthly: {
+    10:  'https://buy.stripe.com/cNifZi2H4bT8e3QgUDcwg04',
+    25:  'https://buy.stripe.com/3cscPQ1YCaAu288cMM',
+    50:  'https://buy.stripe.com/fZucN66Xk8GW5xkdIrcwg05',
+    100: 'https://buy.stripe.com/5kQ8wQchEcXc3pcgUDcwg06'
+  }
+};
+function updateDonateBtn() {
+  var inp = document.getElementById('custom-amount');
+  var isCustom = inp && inp.value;
+  var amt = isCustom ? (parseFloat(inp.value) || 0) : selectedAmt;
+  var freq = 'one-time';
+  if (!isCustom) {
+    var fb = document.querySelectorAll('.dfreq-btn');
+    for (var i = 0; i < fb.length; i++) { if (fb[i].classList.contains('selected')) freq = fb[i].textContent.toLowerCase(); }
+  }
+  var btn = document.getElementById('donate-submit-btn');
+  if (btn) btn.textContent = amt >= 1 ? 'Donate $' + (Number.isInteger(amt) ? amt : amt.toFixed(2)) + ' \u2014 ' + freq : 'Donate';
+}
 function selAmt(a, btn) {
   selectedAmt = a;
   var btns = document.querySelectorAll('.amount-btn');
   for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
   btn.classList.add('selected');
   var inp = document.getElementById('custom-amount'); if (inp) inp.value = '';
-  var disp = document.getElementById('donate-amt-display'); if (disp) disp.textContent = '$' + a;
+  var freqRow = document.getElementById('freq-row'); if (freqRow) freqRow.style.display = 'flex';
+  var note = document.getElementById('donate-onetime-note'); if (note) note.style.display = 'none';
+  updateDonateBtn();
 }
 function clearAmtBtns() {
   var btns = document.querySelectorAll('.amount-btn');
   for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
   var inp = document.getElementById('custom-amount');
   var val = inp ? inp.value : '';
-  selectedAmt = parseFloat(val) || 0;
-  var disp = document.getElementById('donate-amt-display');
-  if (disp) disp.textContent = val ? '$' + Math.round(parseFloat(val)) : '';
+  selectedAmt = 0;
+  // Force one-time and hide freq row
+  var fb = document.querySelectorAll('.dfreq-btn');
+  for (var i = 0; i < fb.length; i++) fb[i].classList.remove('selected');
+  if (fb[0]) fb[0].classList.add('selected');
+  var freqRow = document.getElementById('freq-row'); if (freqRow) freqRow.style.display = val ? 'none' : 'flex';
+  var note = document.getElementById('donate-onetime-note'); if (note) note.style.display = val ? 'block' : 'none';
+  updateDonateBtn();
 }
 function selFreq(btn) {
   var btns = document.querySelectorAll('.dfreq-btn');
   for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
   btn.classList.add('selected');
+  updateDonateBtn();
 }
 function handleDonate() {
   var inp = document.getElementById('custom-amount');
-  var amt = (inp && inp.value) ? parseFloat(inp.value) : selectedAmt;
+  var isCustom = inp && inp.value;
+  var amt = isCustom ? parseFloat(inp.value) : selectedAmt;
   if (!amt || amt < 1) { alert('Please select or enter a donation amount.'); return; }
-  var link = load('acp-stripe-link', '');
-  if (!link) { alert('Stripe not yet configured. Contact the site admin.'); return; }
-  window.open(link + '?prefilled_amount=' + Math.round(amt * 100), '_blank');
+  var freq = 'onetime';
+  if (!isCustom) {
+    var fb = document.querySelectorAll('.dfreq-btn');
+    for (var i = 0; i < fb.length; i++) { if (fb[i].classList.contains('selected') && fb[i].textContent.toLowerCase() === 'monthly') freq = 'monthly'; }
+  }
+  var link;
+  if (freq === 'monthly') {
+    link = STRIPE_LINKS.monthly[amt];
+    if (!link) { alert('Please select $10, $25, $50, or $100 for a monthly donation.'); return; }
+    window.open(link, '_blank');
+  } else {
+    link = STRIPE_LINKS.onetime;
+    window.open(link + '?prefilled_amount=' + Math.round(amt * 100), '_blank');
+  }
 }
 
 // ── DEFAULT DATA ─────────────────────────────
