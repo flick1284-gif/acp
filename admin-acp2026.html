@@ -1702,13 +1702,20 @@ function bindIconClicks() {
       if (!el) return;
       el.classList.add('icon-editable');
       el.title = 'Click to change icon';
-      // Always overwrite onclick to avoid duplicates
-      el.onclick = function(e) {
+      // Use mousedown instead of click — fires before the nav/sticky elements
+      // can intercept, and before any contenteditable focus stealing
+      el.onmousedown = function(e) {
         e.stopPropagation();
         e.preventDefault();
         openIconPicker(elId, e);
       };
-      // Also make sure pointer events aren't blocked
+      el.onclick = function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+      };
+      // Lift above sticky nav with position+z-index
+      el.style.position = 'relative';
+      el.style.zIndex = '200';
       el.style.pointerEvents = 'auto';
       el.style.cursor = 'pointer';
     })(ids[i]);
