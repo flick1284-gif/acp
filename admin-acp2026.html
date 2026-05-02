@@ -443,7 +443,7 @@ body.admin-mode{padding-top:44px;}body.admin-mode nav{top:44px;}
 var GH_OWNER = 'flick1284-gif';
 var GH_REPO  = 'acp';
 var GH_BRANCH = 'draft';
-var GH_TOKEN = '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'; // Replace this with your token
+var GH_TOKEN = 'YOUR_GITHUB_TOKEN_HERE'; // Replace this with your token
 
 // ── PASSWORD GATE ─────────────────────────────
 var ADMIN_PW_HASH = '7e92d1ad7ea2d270a8bbddad6a5d9b81bb5d2e5fd3a9e9bf376c579bc10d67b6';
@@ -2114,7 +2114,7 @@ function buildIconsModal() {
     grid += '<div class="icon-modal-item" id="icon-modal-item-' + id + '">' +
       '<div class="icon-modal-preview" style="width:54px;height:54px;background:var(--maroon);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto .5rem;">' + current + '</div>' +
       '<div style="font-size:12px;color:#7a5c5c;text-align:center;margin-bottom:.5rem;">' + label + '</div>' +
-      '<button onclick="openIconPickerFromModal(\\'' + id + '\\')" style="width:100%;background:#3d1515;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif;">Change</button>' +
+      '<button onclick="openIconPickerFromModal(&apos;' + id + '&apos;)" style="width:100%;background:#3d1515;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif;">Change</button>' +
       '</div>';
   }
 
