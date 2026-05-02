@@ -1693,8 +1693,9 @@ function resetIconToDefault() {
 }
 
 function bindIconClicks() {
-  // Directly bind onclick to every icon element.
-  // Called at init AND after every applyContent() so bindings always survive.
+  // For each icon, inject a full-cover transparent <button> overlay inside it.
+  // This sidesteps sticky nav z-index interception entirely — the button is
+  // a real interactive element inside the icon's own DOM subtree.
   var ids = Object.keys(ICON_CKEYS);
   for (var i = 0; i < ids.length; i++) {
     (function(elId) {
@@ -1702,22 +1703,23 @@ function bindIconClicks() {
       if (!el) return;
       el.classList.add('icon-editable');
       el.title = 'Click to change icon';
-      // Use mousedown instead of click — fires before the nav/sticky elements
-      // can intercept, and before any contenteditable focus stealing
-      el.onmousedown = function(e) {
+      el.style.position = 'relative';
+
+      // Remove any existing overlay to avoid duplicates
+      var existing = el.querySelector('.icon-click-overlay');
+      if (existing) existing.remove();
+
+      // Create a transparent button overlay that covers the entire icon
+      var btn = document.createElement('button');
+      btn.className = 'icon-click-overlay';
+      btn.setAttribute('aria-label', 'Change icon');
+      btn.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;background:transparent;border:none;cursor:pointer;z-index:1;padding:0;margin:0;';
+      btn.onmousedown = function(e) {
         e.stopPropagation();
         e.preventDefault();
         openIconPicker(elId, e);
       };
-      el.onclick = function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-      };
-      // Lift above sticky nav with position+z-index
-      el.style.position = 'relative';
-      el.style.zIndex = '200';
-      el.style.pointerEvents = 'auto';
-      el.style.cursor = 'pointer';
+      el.appendChild(btn);
     })(ids[i]);
   }
 }
