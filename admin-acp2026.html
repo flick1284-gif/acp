@@ -367,7 +367,7 @@ body.admin-mode{padding-top:44px;}body.admin-mode nav{top:44px;}
 .icon-picker-reset{background:#f5e8e8;color:#6b2e2e;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}
 .icon-picker-close{background:none;border:none;font-size:18px;cursor:pointer;color:#7a5c5c;position:absolute;top:.75rem;right:.75rem;line-height:1;}
 .icon-editable{cursor:pointer;position:relative;transition:outline .15s,opacity .15s;}
-.admin-mode .icon-editable:hover{outline:3px solid #fcd34d;outline-offset:3px;opacity:.85;}
+.admin-mode .icon-editable:hover{outline:3px solid #fcd34d;outline-offset:3px;opacity:.85;cursor:help;}
 .rte-toolbar{display:none;position:absolute;z-index:9999;background:#1a1a2e;border-radius:8px;padding:4px 6px;gap:3px;box-shadow:0 4px 16px rgba(0,0,0,.35);flex-wrap:wrap;}
 .rte-color-btn{background:rgba(255,255,255,.1);border:none;border-radius:5px;width:28px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
 .rte-color-btn:hover{background:rgba(255,255,255,.2);}
@@ -443,7 +443,7 @@ body.admin-mode{padding-top:44px;}body.admin-mode nav{top:44px;}
 var GH_OWNER = 'flick1284-gif';
 var GH_REPO  = 'acp';
 var GH_BRANCH = 'draft';
-var GH_TOKEN = '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'; // Replace this with your token
+var GH_TOKEN = 'YOUR_GITHUB_TOKEN_HERE'; // Replace this with your token
 
 // ── PASSWORD GATE ─────────────────────────────
 var ADMIN_PW_HASH = '7e92d1ad7ea2d270a8bbddad6a5d9b81bb5d2e5fd3a9e9bf376c579bc10d67b6';
@@ -483,6 +483,7 @@ async function adminLogin() {
   <span id="admin-save-status"></span>
   <span class="admin-bar-sep"></span>
   <button class="admin-bar-btn" onclick="previewSite()" title="See what the live site looks like with your current edits">&#128065; Preview</button>
+  <button class="admin-bar-btn" onclick="openModal('icons')">&#127914; Icons</button>
   <button class="admin-bar-btn" onclick="openModal('settings')">&#9881; Settings</button>
   <button class="admin-bar-btn dl" id="admin-dl-btn" onclick="publishSite()">&#9729; Save &amp; Publish</button>
 </div>
@@ -1693,34 +1694,14 @@ function resetIconToDefault() {
 }
 
 function bindIconClicks() {
-  // For each icon, inject a full-cover transparent <button> overlay inside it.
-  // This sidesteps sticky nav z-index interception entirely — the button is
-  // a real interactive element inside the icon's own DOM subtree.
+  // Icons are now edited via the Icons modal (admin bar → Icons button).
+  // This function just marks them visually so users know they're editable.
   var ids = Object.keys(ICON_CKEYS);
   for (var i = 0; i < ids.length; i++) {
-    (function(elId) {
-      var el = document.getElementById(elId);
-      if (!el) return;
-      el.classList.add('icon-editable');
-      el.title = 'Click to change icon';
-      el.style.position = 'relative';
-
-      // Remove any existing overlay to avoid duplicates
-      var existing = el.querySelector('.icon-click-overlay');
-      if (existing) existing.remove();
-
-      // Create a transparent button overlay that covers the entire icon
-      var btn = document.createElement('button');
-      btn.className = 'icon-click-overlay';
-      btn.setAttribute('aria-label', 'Change icon');
-      btn.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;background:transparent;border:none;cursor:pointer;z-index:1;padding:0;margin:0;';
-      btn.onmousedown = function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        openIconPicker(elId, e);
-      };
-      el.appendChild(btn);
-    })(ids[i]);
+    var el = document.getElementById(ids[i]);
+    if (!el) continue;
+    el.classList.add('icon-editable');
+    el.title = 'Use the Icons button in the admin bar to change this icon';
   }
 }
 
@@ -2105,7 +2086,56 @@ function buildModalContent(name) {
   if (name === 'programs')  return buildProgramsModal();
   if (name === 'resources') return buildResourcesModal();
   if (name === 'settings')  return buildSettingsModal();
+  if (name === 'icons')     return buildIconsModal();
   return '<p>Unknown modal</p>';
+}
+
+
+// ── ICONS MODAL ──────────────────────────────
+function buildIconsModal() {
+  var iconIds = Object.keys(ICON_CKEYS);
+  var iconLabels = {
+    'mission-v1-icon': 'Value Card 1',
+    'mission-v2-icon': 'Value Card 2',
+    'mission-v3-icon': 'Value Card 3',
+    'prog-prev1-icon': 'Program Card 1',
+    'prog-prev2-icon': 'Program Card 2',
+    'prog-prev3-icon': 'Program Card 3',
+    'contact-email-icon': 'Contact: Email',
+    'contact-phone-icon': 'Contact: Phone'
+  };
+
+  var grid = '';
+  for (var i = 0; i < iconIds.length; i++) {
+    var id = iconIds[i];
+    var cKey = ICON_CKEYS[id];
+    var current = C[cKey] || '&#9679;';
+    var label = iconLabels[id] || id;
+    grid += '<div class="icon-modal-item" id="icon-modal-item-' + id + '">' +
+      '<div class="icon-modal-preview" style="width:54px;height:54px;background:var(--maroon);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto .5rem;">' + current + '</div>' +
+      '<div style="font-size:12px;color:#7a5c5c;text-align:center;margin-bottom:.5rem;">' + label + '</div>' +
+      '<button onclick="openIconPickerFromModal('' + id + '')" style="width:100%;background:#3d1515;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif;">Change</button>' +
+      '</div>';
+  }
+
+  return '<h3 style="font-family:Nunito,sans-serif;color:#3d1515;margin-bottom:1.25rem;">&#127914; Edit Icons</h3>' +
+    '<p style="font-size:13px;color:#7a5c5c;margin-bottom:1.5rem;">Click <strong>Change</strong> on any icon to pick a new one from the emoji library.</p>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;">' + grid + '</div>' +
+    '<button onclick="closeModal()" style="width:100%;padding:12px;background:#f5f0ee;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-family:Nunito,sans-serif;color:#3d1515;font-weight:600;">Done</button>';
+}
+
+function openIconPickerFromModal(elId) {
+  // Close icons modal first, then open the icon picker anchored to that icon
+  closeModal();
+  setTimeout(function() {
+    var el = document.getElementById(elId);
+    if (el) {
+      // Create a synthetic event positioned at the element
+      var rect = el.getBoundingClientRect();
+      var syntheticEvent = { target: el, clientX: rect.left, clientY: rect.bottom };
+      openIconPicker(elId, syntheticEvent);
+    }
+  }, 50);
 }
 
 // ── PHOTOS MODAL ─────────────────────────────
