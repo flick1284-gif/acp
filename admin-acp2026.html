@@ -345,28 +345,24 @@ body.admin-mode{padding-top:44px;}body.admin-mode nav{top:44px;}
 .settings-group:last-child{border-bottom:none;margin-bottom:0;}
 .settings-group h4{font-size:14px;font-weight:700;color:#3d1515;margin-bottom:.4rem;}
 .settings-group p{font-size:13px;color:#7a5c5c;line-height:1.65;margin-bottom:.9rem;}
-.icon-picker-wrap{position:fixed;z-index:20000;background:white;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.25);width:380px;padding:1.25rem 1.25rem 1rem;font-family:'Nunito',sans-serif;position:fixed;}
-.icon-picker-wrap h4{font-size:13px;font-weight:700;color:#3d1515;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.06em;}
-.icon-search{width:100%;border:1.5px solid #e0c8c2;border-radius:8px;padding:7px 10px;font-size:13px;font-family:'Nunito',sans-serif;outline:none;margin-bottom:.6rem;color:#3d1515;}
-.icon-search:focus{border-color:#3d1515;}
-.icon-tabs{display:flex;gap:4px;margin-bottom:.6rem;flex-wrap:wrap;}
-.icon-tab{background:#f5e8e8;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:#6b2e2e;cursor:pointer;font-family:'Nunito',sans-serif;}
-.icon-tab.active,.icon-tab:hover{background:#3d1515;color:white;}
-.icon-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;max-height:180px;overflow-y:auto;margin-bottom:.75rem;}
-.icon-cell{font-size:20px;text-align:center;padding:5px 2px;border-radius:6px;cursor:pointer;transition:background .12s;line-height:1.2;}
-.icon-cell:hover{background:#f5e8e8;}
-.icon-cell.selected{background:#e0c8c2;}
-.icon-picker-divider{border:none;border-top:1px solid #e0c8c2;margin:.6rem 0;}
-.icon-upload-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
-.icon-upload-btn{background:#f5e8e8;border:1.5px dashed #d9b0a9;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;color:#6b2e2e;cursor:pointer;font-family:'Nunito',sans-serif;flex:1;text-align:center;}
-.icon-upload-btn:hover{background:#e0c8c2;}
-.icon-upload-status{font-size:11px;color:#6b2e2e;flex:1;}
-.icon-picker-actions{display:flex;gap:.5rem;}
-.icon-picker-apply{background:#3d1515;color:white;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;flex:1;}
-.icon-picker-apply:hover{background:#5a2020;}
-.icon-picker-reset{background:#f5e8e8;color:#6b2e2e;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}
-.icon-picker-close{background:none;border:none;font-size:18px;cursor:pointer;color:#7a5c5c;position:absolute;top:.75rem;right:.75rem;line-height:1;}
-.icon-editable{cursor:pointer;position:relative;transition:outline .15s,opacity .15s;}
+
+.admin-mode .icon-editable:hover{outline:3px solid #fcd34d;outline-offset:3px;cursor:help;}
+.icon-upload-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20000;display:flex;align-items:center;justify-content:center;}
+.icon-upload-box{background:white;border-radius:18px;padding:2rem;width:100%;max-width:400px;font-family:'Nunito',sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.icon-upload-box h4{color:#3d1515;margin:0 0 .5rem;font-size:1.1rem;}
+.icon-upload-box p{font-size:13px;color:#7a5c5c;margin-bottom:1.25rem;line-height:1.6;}
+.icon-upload-dropzone{border:2px dashed #d9b0a9;border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;transition:background .2s;margin-bottom:1rem;}
+.icon-upload-dropzone:hover{background:#fdf5f3;}
+.icon-upload-dropzone input{display:none;}
+.icon-upload-preview{display:flex;align-items:center;gap:1rem;background:#faf8f7;border-radius:10px;padding:.75rem;margin-bottom:1rem;display:none;}
+.icon-upload-preview-box{width:56px;height:56px;background:var(--maroon);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+.icon-upload-preview-box img{width:100%;height:100%;object-fit:contain;}
+.icon-upload-actions{display:flex;gap:.75rem;}
+.icon-upload-cancel{flex:1;padding:11px;background:#f5f0ee;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-family:'Nunito',sans-serif;color:#3d1515;font-weight:600;}
+.icon-upload-apply{flex:2;padding:11px;background:#3d1515;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;}
+.icon-upload-apply:disabled{opacity:.5;cursor:not-allowed;}
+.icon-upload-status{font-size:12px;color:#7a5c5c;text-align:center;min-height:16px;margin-bottom:.5rem;}
+
 .admin-mode .icon-editable:hover{outline:3px solid #fcd34d;outline-offset:3px;opacity:.85;cursor:help;}
 .icon-cell:hover{background:#f5e8e8 !important;border-color:#d9b0a9 !important;}
 .icon-cell.selected{background:#fde8e8 !important;border-color:#3d1515 !important;outline:2px solid #3d1515;}
@@ -445,7 +441,7 @@ body.admin-mode{padding-top:44px;}body.admin-mode nav{top:44px;}
 var GH_OWNER = 'flick1284-gif';
 var GH_REPO  = 'acp';
 var GH_BRANCH = 'draft';
-var GH_TOKEN = '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'; // Replace this with your token
+var GH_TOKEN = 'YOUR_GITHUB_TOKEN_HERE'; // Replace this with your token
 
 // ── PASSWORD GATE ─────────────────────────────
 var ADMIN_PW_HASH = '7e92d1ad7ea2d270a8bbddad6a5d9b81bb5d2e5fd3a9e9bf376c579bc10d67b6';
@@ -1484,322 +1480,212 @@ var ICON_SIZES = {
   'contact-email-icon': 36, 'contact-phone-icon': 36
 };
 
-var EMOJI_SETS = {
-  'Career': ['&#128188;','&#128203;','&#128204;','&#128205;','&#128196;','&#128197;','&#128198;','&#128199;','&#128200;','&#128201;','&#128202;','&#9997;','&#128397;','&#128396;','&#128176;','&#128181;','&#128184;','&#128185;','&#128186;'],
-  'People': ['&#128104;','&#128105;','&#129489;','&#128104;&#8205;&#128187;','&#128105;&#8205;&#128187;','&#129309;','&#129314;','&#128587;','&#128588;','&#129379;','&#128170;','&#129504;','&#127775;','&#128161;','&#128640;'],
-  'Nature': ['&#127775;','&#127776;','&#10024;','&#127774;','&#127757;','&#127758;','&#127759;','&#127807;','&#127808;','&#127822;','&#127825;','&#127800;','&#127801;','&#127802;','&#127803;'],
-  'Objects': ['&#128241;','&#128242;','&#128187;','&#128190;','&#128191;','&#128192;','&#128222;','&#9993;','&#128140;','&#128141;','&#128142;','&#128143;','&#128214;','&#128215;','&#128216;','&#128217;','&#128218;','&#128279;','&#128280;'],
-  'Symbols': ['&#128994;','&#128309;','&#128308;','&#128310;','&#128311;','&#128312;','&#128313;','&#9989;','&#10003;','&#10060;','&#9888;','&#8505;','&#128161;','&#128162;','&#128163;','&#128164;']
-};
+// ── ICON UPLOAD PICKER ───────────────────────
+// Simple image upload with canvas background removal.
+// Opens as a modal, removes background, commits to GitHub as /images/icons/.
 
-var _iconPickerWrap = null;
-var _iconPickerTarget = null; // element id being edited
-var _iconPickerSelected = null; // currently selected emoji html
-var _iconPickerUploadData = null; // base64 image data if uploaded
-var _iconPickerCat = 'Career';
+var _iconUploadTarget = null;
+var _iconUploadCanvas = null;
+var _iconUploadBlob = null;
 
-function initIconPicker() {
-  // Build picker DOM once
-  _iconPickerWrap = document.createElement('div');
-  _iconPickerWrap.className = 'icon-picker-wrap';
-  _iconPickerWrap.style.display = 'none';
-  _iconPickerWrap.style.position = 'fixed';
-  _iconPickerWrap.innerHTML = buildIconPickerHTML();
-  document.body.appendChild(_iconPickerWrap);
+function openIconUploadModal(elId) {
+  _iconUploadTarget = elId;
+  _iconUploadBlob = null;
 
-  // Click outside closes
-  document.addEventListener('mousedown', function(e) {
-    if (_iconPickerWrap.style.display !== 'none' && !_iconPickerWrap.contains(e.target)) {
-      var targetEl = document.getElementById(_iconPickerTarget);
-      if (!targetEl || !targetEl.contains(e.target)) closeIconPicker();
-    }
-  });
-}
+  // Remove existing modal if any
+  var existing = document.getElementById('icon-upload-modal');
+  if (existing) existing.remove();
 
-function buildIconPickerHTML() {
-  // Bare container — everything built via DOM in setupIconPickerEvents
-  return '<div id="icon-picker-inner"></div>';
-}
+  var modal = document.createElement('div');
+  modal.id = 'icon-upload-modal';
+  modal.className = 'icon-upload-modal';
 
-function setupIconPickerEvents() {
-  var inner = _iconPickerWrap ? _iconPickerWrap.querySelector('#icon-picker-inner') : null;
-  if (!inner) return;
-  inner.innerHTML = '';
-  inner.style.cssText = 'font-family:Nunito,sans-serif;';
-
-  // Close button
-  var closeBtn = document.createElement('button');
-  closeBtn.innerHTML = '&#10005;';
-  closeBtn.style.cssText = 'position:absolute;top:.6rem;right:.6rem;background:none;border:none;font-size:16px;cursor:pointer;color:#7a5c5c;padding:4px 8px;border-radius:6px;';
-  closeBtn.onclick = closeIconPicker;
-  inner.appendChild(closeBtn);
+  var box = document.createElement('div');
+  box.className = 'icon-upload-box';
 
   // Title
   var title = document.createElement('h4');
-  title.textContent = 'Choose an Emoji Icon';
-  title.style.cssText = 'margin:0 0 .75rem;color:#3d1515;font-size:1rem;padding-right:2rem;';
-  inner.appendChild(title);
+  title.textContent = 'Change Icon Image';
+  box.appendChild(title);
 
-  // Category tabs
-  var cats = Object.keys(EMOJI_SETS);
-  var tabRow = document.createElement('div');
-  tabRow.style.cssText = 'display:flex;gap:.4rem;margin-bottom:.75rem;flex-wrap:wrap;';
-  cats.forEach(function(cat) {
-    var tab = document.createElement('button');
-    tab.textContent = cat;
-    var active = cat === _iconPickerCat;
-    tab.style.cssText = 'padding:4px 10px;border-radius:20px;border:1px solid ' + (active ? '#3d1515' : '#e0d0cc') + ';background:' + (active ? '#3d1515' : 'white') + ';color:' + (active ? 'white' : '#5a3a3a') + ';font-size:12px;cursor:pointer;font-family:Nunito,sans-serif;font-weight:600;';
-    tab.onclick = function() { _iconPickerCat = cat; setupIconPickerEvents(); };
-    tabRow.appendChild(tab);
-  });
-  inner.appendChild(tabRow);
+  var desc = document.createElement('p');
+  desc.textContent = 'Upload a PNG, JPG or SVG. The background will be automatically removed and placed on the maroon background.';
+  box.appendChild(desc);
 
-  // Emoji grid
-  var emojis = EMOJI_SETS[_iconPickerCat] || [];
-  var grid = document.createElement('div');
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:.75rem;max-height:180px;overflow-y:auto;';
-  emojis.forEach(function(emoji) {
-    var cell = document.createElement('div');
-    cell.innerHTML = emoji;
-    cell.className = 'icon-cell';
-    cell.title = 'Click to select';
-    cell.style.cssText = 'font-size:22px;text-align:center;padding:6px 2px;border-radius:8px;cursor:pointer;border:2px solid transparent;';
-    if (emoji === _iconPickerSelected) {
-      cell.style.background = '#fde8e8';
-      cell.style.borderColor = '#3d1515';
-    }
-    cell.onclick = function() { selectIconEmoji(emoji); };
-    grid.appendChild(cell);
-  });
-  inner.appendChild(grid);
+  // Current icon preview
+  var currentEl = document.getElementById(elId);
+  var currentSrc = currentEl ? currentEl.querySelector('img') : null;
 
-  // Current icon preview + instructions
+  // Dropzone
+  var dropzone = document.createElement('div');
+  dropzone.className = 'icon-upload-dropzone';
+  dropzone.innerHTML = '<div style="font-size:2rem;margin-bottom:.5rem;">&#128247;</div><div style="font-weight:700;color:#3d1515;margin-bottom:.25rem;">Click to choose an image</div><div style="font-size:12px;color:#7a5c5c;">PNG with transparent background works best</div>';
+
+  var fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  dropzone.appendChild(fileInput);
+  dropzone.onclick = function() { fileInput.click(); };
+  fileInput.onchange = function(e) {
+    if (e.target.files[0]) processIconFile(e.target.files[0], previewBox, previewRow, statusEl, applyBtn);
+  };
+  box.appendChild(dropzone);
+
+  // Preview row (hidden until file chosen)
   var previewRow = document.createElement('div');
-  previewRow.style.cssText = 'display:flex;align-items:center;gap:.75rem;background:#faf8f7;border-radius:10px;padding:.6rem .75rem;margin-bottom:.75rem;';
-  var size = ICON_SIZES[_iconPickerTarget] || 54;
+  previewRow.className = 'icon-upload-preview';
   var previewBox = document.createElement('div');
-  previewBox.id = 'icon-preview-box';
-  previewBox.style.cssText = 'width:' + size + 'px;height:' + size + 'px;background:var(--maroon);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:' + Math.round(size*0.55) + 'px;flex-shrink:0;';
-  var srcEl = document.getElementById(_iconPickerTarget);
-  if (srcEl) previewBox.innerHTML = srcEl.innerHTML;
-  var instructions = document.createElement('div');
-  instructions.style.cssText = 'font-size:12px;color:#7a5c5c;font-family:Nunito,sans-serif;line-height:1.5;';
-  instructions.innerHTML = 'Choose an emoji above, then click <strong style="color:#3d1515;">Apply</strong> to save.';
+  previewBox.className = 'icon-upload-preview-box';
+  var previewLabel = document.createElement('div');
+  previewLabel.style.cssText = 'font-size:13px;color:#5a3a3a;font-family:Nunito,sans-serif;';
+  previewLabel.innerHTML = '<strong>Preview</strong><br><span style="font-size:11px;color:#7a5c5c;">How it will look on the site</span>';
   previewRow.appendChild(previewBox);
-  previewRow.appendChild(instructions);
-  inner.appendChild(previewRow);
+  previewRow.appendChild(previewLabel);
+  box.appendChild(previewRow);
 
-  // Action buttons
+  // Status
+  var statusEl = document.createElement('div');
+  statusEl.className = 'icon-upload-status';
+  box.appendChild(statusEl);
+
+  // Actions
   var actions = document.createElement('div');
-  actions.className = 'icon-picker-actions';
-  
-  var resetBtn = document.createElement('button');
-  resetBtn.className = 'icon-picker-reset';
-  resetBtn.innerHTML = '&#8635; Reset';
-  resetBtn.onclick = resetIconToDefault;
+  actions.className = 'icon-upload-actions';
+
+  var cancelBtn = document.createElement('button');
+  cancelBtn.className = 'icon-upload-cancel';
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.onclick = function() { modal.remove(); };
 
   var applyBtn = document.createElement('button');
-  applyBtn.className = 'icon-picker-apply';
-  applyBtn.innerHTML = '&#10003; Apply';
-  applyBtn.onclick = applyIconPicker;
+  applyBtn.className = 'icon-upload-apply';
+  applyBtn.textContent = 'Apply Icon';
+  applyBtn.disabled = true;
+  applyBtn.onclick = function() { applyIconUpload(elId, modal, statusEl, applyBtn); };
 
-  actions.appendChild(resetBtn);
+  actions.appendChild(cancelBtn);
   actions.appendChild(applyBtn);
-  inner.appendChild(actions);
+  box.appendChild(actions);
+
+  modal.appendChild(box);
+  modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+  document.body.appendChild(modal);
 }
 
-
-function switchIconCat(cat) {
-  _iconPickerCat = cat;
-  _iconPickerWrap.innerHTML = buildIconPickerHTML();
-  setupIconPickerEvents();
-}
-
-function setupIconPickerEvents() {
-  // Wire category tab clicks
-  var catBtns = _iconPickerWrap.querySelectorAll('.icon-cat-btn');
-  catBtns.forEach(function(btn) {
-    btn.onclick = function() { switchIconCat(btn.getAttribute('data-cat')); };
-  });
-
-  // Wire emoji cell clicks
-  var cells = _iconPickerWrap.querySelectorAll('.icon-cell');
-  var emojis = EMOJI_SETS[_iconPickerCat] || [];
-  cells.forEach(function(cell, idx) {
-    cell.onclick = function() { selectIconEmoji(emojis[idx]); };
-  });
-
-  // Show current icon in preview
-  var box = _iconPickerWrap ? _iconPickerWrap.querySelector('#icon-preview-box') : null;
-  if (box && _iconPickerTarget) {
-    var el = document.getElementById(_iconPickerTarget);
-    if (el) box.innerHTML = el.innerHTML;
-  }
-}
-function openIconPicker(elId, event) {
-  _iconPickerTarget = elId;
-  _iconPickerSelected = null;
-  _iconPickerUploadData = null;
-  _iconPickerCat = 'Career';
-  _iconPickerWrap.innerHTML = buildIconPickerHTML();
-  setupIconPickerEvents();
-
-  // Position near the icon element (not event.target which may be a child)
-  var iconEl = document.getElementById(elId);
-  var r = (iconEl || event.target).getBoundingClientRect();
-  var top = r.bottom + 8 + window.scrollY;
-  var left = r.left + window.scrollX;
-  // Keep on screen
-  if (left + 320 > window.innerWidth - 16) left = window.innerWidth - 336;
-  if (top + 420 > window.innerHeight + window.scrollY) top = r.top + window.scrollY - 428;
-  _iconPickerWrap.style.top = top + 'px';
-  _iconPickerWrap.style.left = left + 'px';
-  _iconPickerWrap.style.display = 'block';
-
-  // Show current icon in preview box
-  setTimeout(function() {
-    var box = _iconPickerWrap ? _iconPickerWrap.querySelector('#icon-preview-box') : null;
-    if (box) {
-      var el = document.getElementById(_iconPickerTarget);
-      box.innerHTML = el ? el.innerHTML : '';
-    }
-  }, 30);
-}
-
-function closeIconPicker() {
-  if (_iconPickerWrap) _iconPickerWrap.style.display = 'none';
-  _iconPickerTarget = null;
-}
-
-function switchIconCat(cat) {
-  _iconPickerCat = cat;
-  _iconPickerWrap.innerHTML = buildIconPickerHTML();
-}
-
-function filterIconEmoji(query) {
-  var grid = document.getElementById('icon-grid');
-  if (!grid) return;
-  if (!query) { switchIconCat(_iconPickerCat); return; }
-  // Search all categories
-  var all = [];
-  Object.values(EMOJI_SETS).forEach(function(arr) { all = all.concat(arr); });
-  // Simple filter: show all (emoji search by code point not feasible without a library)
-  // Just show full grid when typing
-  grid.innerHTML = all.map(function(e) {
-    return '<div class="icon-cell" onclick="selectIconEmoji(&apos;' + e + '&apos;)">' + e + '</div>';
-  }).join('');
-}
-
-function selectIconEmoji(emoji) {
-  _iconPickerSelected = emoji;
-  _iconPickerUploadData = null;
-  // Highlight selected
-  var cells = _iconPickerWrap.querySelectorAll('.icon-cell');
-  cells.forEach(function(c) {
-    c.classList.toggle('selected', c.innerHTML === emoji || c.textContent === emoji);
-  });
-  var status = document.getElementById('icon-upload-status');
-  if (status) status.textContent = 'PNG, JPG, SVG — auto-resized';
-}
-
-function handleIconUpload(event) {
-  var file = event.target.files[0];
-  if (!file) return;
-  var status = document.getElementById('icon-upload-status');
-
-  // Validate file type
-  if (!file.type.match(/^image\//)) {
-    if (status) status.textContent = '❌ Not an image file';
-    return;
-  }
-
-  // Check raw file size (warn if > 500KB before resize)
-  var rawKB = Math.round(file.size / 1024);
-  if (status) status.textContent = 'Processing...';
+function processIconFile(file, previewBox, previewRow, statusEl, applyBtn) {
+  statusEl.textContent = 'Processing...';
+  applyBtn.disabled = true;
+  _iconUploadBlob = null;
 
   var reader = new FileReader();
   reader.onload = function(e) {
     var img = new Image();
     img.onload = function() {
-      // Determine target size for this icon
-      var size = ICON_SIZES[_iconPickerTarget] || 54;
-      // Always resize to 2x for retina
-      var targetPx = size * 2;
-
+      // Draw on canvas and remove background
+      var size = 200;
       var canvas = document.createElement('canvas');
-      canvas.width = targetPx;
-      canvas.height = targetPx;
+      canvas.width = size;
+      canvas.height = size;
       var ctx = canvas.getContext('2d');
 
-      // Fill with transparent background, draw image centered/cropped
-      ctx.clearRect(0, 0, targetPx, targetPx);
-      var scale = Math.max(targetPx / img.width, targetPx / img.height);
-      var sw = img.width * scale;
-      var sh = img.height * scale;
-      ctx.drawImage(img, (targetPx - sw) / 2, (targetPx - sh) / 2, sw, sh);
+      // Draw image centered and scaled
+      var scale = Math.min(size / img.width, size / img.height) * 0.85;
+      var w = img.width * scale;
+      var h = img.height * scale;
+      var x = (size - w) / 2;
+      var y = (size - h) / 2;
+      ctx.drawImage(img, x, y, w, h);
 
-      var dataUrl = canvas.toDataURL('image/png', 0.9);
-      var outputKB = Math.round(dataUrl.length * 0.75 / 1024);
+      // Remove background: sample corner color and flood-fill transparent
+      removeBackground(ctx, canvas, size);
 
-      _iconPickerUploadData = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover;" alt="">';
-      _iconPickerSelected = null;
+      // Show preview
+      previewBox.innerHTML = '';
+      var previewImg = document.createElement('img');
+      previewImg.src = canvas.toDataURL('image/png');
+      previewImg.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+      previewBox.appendChild(previewImg);
+      previewRow.style.display = 'flex';
 
-      if (status) {
-        if (rawKB > 500) {
-          status.textContent = '⚠️ Original was ' + rawKB + 'KB → resized to ' + outputKB + 'KB ✔';
-        } else {
-          status.textContent = '✔ ' + rawKB + 'KB → ' + outputKB + 'KB, ' + targetPx + '×' + targetPx + 'px';
-        }
-        status.style.color = '#16a34a';
-      }
-    };
-    img.onerror = function() {
-      if (status) { status.textContent = '❌ Could not read image'; status.style.color = '#ef4444'; }
+      // Store blob for upload
+      canvas.toBlob(function(blob) {
+        _iconUploadBlob = blob;
+        applyBtn.disabled = false;
+        statusEl.textContent = 'Looking good! Click Apply to save.';
+      }, 'image/png');
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
-  event.target.value = ''; // reset so same file can be re-chosen
 }
 
-function applyIconPicker() {
-  if (!_iconPickerTarget) return;
-  var cKey = ICON_CKEYS[_iconPickerTarget];
-  if (!cKey) return;
+function removeBackground(ctx, canvas, size) {
+  var imageData = ctx.getImageData(0, 0, size, size);
+  var data = imageData.data;
 
-  var value = null;
-  if (_iconPickerUploadData) {
-    value = _iconPickerUploadData;
-  } else if (_iconPickerSelected) {
-    value = _iconPickerSelected;
-  } else {
-    closeIconPicker();
-    return;
+  // Sample background color from corners
+  function getPixel(x, y) {
+    var i = (y * size + x) * 4;
+    return [data[i], data[i+1], data[i+2], data[i+3]];
+  }
+  function colorDistance(a, b) {
+    return Math.sqrt(Math.pow(a[0]-b[0],2) + Math.pow(a[1]-b[1],2) + Math.pow(a[2]-b[2],2));
   }
 
-  C[cKey] = value;
-  // Update the DOM element immediately
-  var el = document.getElementById(_iconPickerTarget);
-  if (el) el.innerHTML = value;
-  doSave();
-  closeIconPicker();
+  var corners = [getPixel(0,0), getPixel(size-1,0), getPixel(0,size-1), getPixel(size-1,size-1)];
+  var bgColor = corners[0]; // use top-left corner as background color
+  var threshold = 40;
+
+  // Make pixels similar to background transparent
+  for (var i = 0; i < data.length; i += 4) {
+    var pixel = [data[i], data[i+1], data[i+2], data[i+3]];
+    if (data[i+3] < 10) continue; // already transparent
+    var minDist = Math.min.apply(null, corners.map(function(c) { return colorDistance(pixel, c); }));
+    if (minDist < threshold) {
+      data[i+3] = 0; // make transparent
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
 }
 
-function resetIconToDefault() {
-  if (!_iconPickerTarget) return;
-  var cKey = ICON_CKEYS[_iconPickerTarget];
-  var def = ICON_DEFAULTS[_iconPickerTarget];
-  if (!cKey || !def) return;
-  C[cKey] = def;
-  var el = document.getElementById(_iconPickerTarget);
-  if (el) el.innerHTML = def;
-  doSave();
-  closeIconPicker();
+function applyIconUpload(elId, modal, statusEl, applyBtn) {
+  if (!_iconUploadBlob) return;
+  statusEl.textContent = 'Uploading to GitHub...';
+  applyBtn.disabled = true;
+
+  var filename = 'icon-' + elId + '-' + Date.now() + '.png';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var base64 = e.target.result; // already data:image/png;base64,...
+    commitImageToGitHub(filename, base64, 'image/png')
+      .then(function(url) {
+        // Update the icon element with an img tag
+        var el = document.getElementById(elId);
+        if (el) {
+          el.innerHTML = '<img src="' + url + '?t=' + Date.now() + '" style="width:80%;height:80%;object-fit:contain;">';
+          // Save to content
+          var cKey = ICON_CKEYS[elId];
+          if (cKey) {
+            C[cKey] = '<img src="' + url + '" style="width:80%;height:80%;object-fit:contain;">';
+            doSave();
+          }
+        }
+        // Update the icon modal preview if open
+        populateIconsModal();
+        modal.remove();
+        showPublishResult(true, 'Icon updated! Hit Save & Publish to make it live.');
+      })
+      .catch(function(err) {
+        statusEl.textContent = 'Upload failed: ' + (err.message || err);
+        applyBtn.disabled = false;
+      });
+  };
+  reader.readAsDataURL(_iconUploadBlob);
 }
 
 function bindIconClicks() {
-  // Icons are now edited via the Icons modal (admin bar → Icons button).
-  // This function just marks them visually so users know they're editable.
+  // Mark icon elements visually so users know they're editable via the Icons button
+  if (typeof ICON_CKEYS === 'undefined') return;
   var ids = Object.keys(ICON_CKEYS);
   for (var i = 0; i < ids.length; i++) {
     var el = document.getElementById(ids[i]);
@@ -1835,7 +1721,6 @@ function initAdminLayer() {
   applyNavConfig();
   makeTextEditable();
   initAboutRTE();
-  initIconPicker();
   initIconEditable();
   injectCarouselOverlay();
   injectSectionButtons();
@@ -2254,7 +2139,7 @@ function populateIconsModal() {
       var btn = document.createElement('button');
       btn.textContent = 'Change';
       btn.style.cssText = 'width:100%;background:#3d1515;color:white;border:none;border-radius:8px;padding:7px 4px;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif;font-weight:600;';
-      btn.onclick = function() { openIconPickerFromModal(elId); };
+      btn.onclick = function() { openIconUploadModal(elId); };
 
       item.appendChild(preview);
       item.appendChild(lbl);
@@ -2264,26 +2149,6 @@ function populateIconsModal() {
   }
 }
 
-function openIconPickerFromModal(elId) {
-  // Keep modal open, open picker centered on screen above everything
-  _iconPickerTarget = elId;
-  _iconPickerSelected = null;
-  _iconPickerUploadData = null;
-  _iconPickerCat = 'Career';
-  _iconPickerWrap.innerHTML = buildIconPickerHTML();
-
-  // Center on screen
-  var pw = 320, ph = 440;
-  var left = Math.max(16, (window.innerWidth - pw) / 2);
-  var top = Math.max(60, (window.innerHeight - ph) / 2);
-  _iconPickerWrap.style.left = left + 'px';
-  _iconPickerWrap.style.top = top + 'px';
-  _iconPickerWrap.style.display = 'block';
-  _iconPickerWrap.style.zIndex = '20000'; // above modal overlay (10000)
-
-  // Wire up all events and show current icon
-  setTimeout(function() { setupIconPickerEvents(); }, 0);
-}
 
 // ── PHOTOS MODAL ─────────────────────────────
 function buildPhotosModal() {
@@ -3121,7 +2986,7 @@ function buildModals() {
 
   var box = document.createElement('div');
   box.id = 'admin-modal-content';
-  box.style.cssText = 'background:white;border-radius:18px;width:100%;max-width:640px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:2rem;box-sizing:border-box;';
+  box.style.cssText = 'background:white;border-radius:18px;width:100%;max-width:640px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);';
 
   overlay.appendChild(box);
   document.body.appendChild(overlay);
