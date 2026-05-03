@@ -3084,7 +3084,7 @@ function publishSite() {
   });
 
   // Admin: fetch current admin from main branch and update baked data
-  var adminSrcPath = window.location.pathname.split('/').pop() || 'admin-acp2026.html';
+ var adminSrcPath = 'admin-acp2026.html';
   var adminPromise = fetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + adminSrcPath + '?ref=main', {
     headers: { 'Authorization': 'token ' + GH_TOKEN, 'Accept': 'application/vnd.github+json' }
   }).then(function(r) {
@@ -3105,7 +3105,7 @@ function publishSite() {
   var now = new Date();
   var stamp = now.toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit', hour12:true });
   var commitMsg = 'Content update — ' + stamp;
-  var adminSrcPathFinal = window.location.pathname.split('/').pop() || 'admin-acp2026.html';
+  var adminSrcPathFinal = 'admin-acp2026.html';
 
   Promise.all([indexPromise, adminPromise]).then(function() {
     if (!indexFinal || !adminFinal) throw new Error('Could not load source files from GitHub.');
