@@ -345,7 +345,7 @@ body.admin-mode{padding-top:44px;}body.admin-mode nav{top:44px;}
 .settings-group:last-child{border-bottom:none;margin-bottom:0;}
 .settings-group h4{font-size:14px;font-weight:700;color:#3d1515;margin-bottom:.4rem;}
 .settings-group p{font-size:13px;color:#7a5c5c;line-height:1.65;margin-bottom:.9rem;}
-.icon-picker-wrap{position:fixed;z-index:10001;background:white;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.25);width:320px;padding:1rem;font-family:'Nunito',sans-serif;}
+.icon-picker-wrap{position:fixed;z-index:20000;background:white;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.25);width:380px;padding:1.25rem 1.25rem 1rem;font-family:'Nunito',sans-serif;position:fixed;}
 .icon-picker-wrap h4{font-size:13px;font-weight:700;color:#3d1515;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.06em;}
 .icon-search{width:100%;border:1.5px solid #e0c8c2;border-radius:8px;padding:7px 10px;font-size:13px;font-family:'Nunito',sans-serif;outline:none;margin-bottom:.6rem;color:#3d1515;}
 .icon-search:focus{border-color:#3d1515;}
@@ -368,6 +368,8 @@ body.admin-mode{padding-top:44px;}body.admin-mode nav{top:44px;}
 .icon-picker-close{background:none;border:none;font-size:18px;cursor:pointer;color:#7a5c5c;position:absolute;top:.75rem;right:.75rem;line-height:1;}
 .icon-editable{cursor:pointer;position:relative;transition:outline .15s,opacity .15s;}
 .admin-mode .icon-editable:hover{outline:3px solid #fcd34d;outline-offset:3px;opacity:.85;cursor:help;}
+.icon-cell:hover{background:#f5e8e8 !important;border-color:#d9b0a9 !important;}
+.icon-cell.selected{background:#fde8e8 !important;border-color:#3d1515 !important;outline:2px solid #3d1515;}
 .rte-toolbar{display:none;position:absolute;z-index:9999;background:#1a1a2e;border-radius:8px;padding:4px 6px;gap:3px;box-shadow:0 4px 16px rgba(0,0,0,.35);flex-wrap:wrap;}
 .rte-color-btn{background:rgba(255,255,255,.1);border:none;border-radius:5px;width:28px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
 .rte-color-btn:hover{background:rgba(255,255,255,.2);}
@@ -443,7 +445,7 @@ body.admin-mode{padding-top:44px;}body.admin-mode nav{top:44px;}
 var GH_OWNER = 'flick1284-gif';
 var GH_REPO  = 'acp';
 var GH_BRANCH = 'draft';
-var GH_TOKEN = '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'; // Replace this with your token
+var GH_TOKEN = 'YOUR_GITHUB_TOKEN_HERE'; // Replace this with your token
 
 // ── PASSWORD GATE ─────────────────────────────
 var ADMIN_PW_HASH = '7e92d1ad7ea2d270a8bbddad6a5d9b81bb5d2e5fd3a9e9bf376c579bc10d67b6';
@@ -1515,23 +1517,124 @@ function initIconPicker() {
 }
 
 function buildIconPickerHTML() {
+  // Bare container — everything built via DOM in setupIconPickerEvents
+  return '<div id="icon-picker-inner"></div>';
+}
+
+function setupIconPickerEvents() {
+  var inner = document.getElementById('icon-picker-inner');
+  if (!inner) return;
+  inner.innerHTML = '';
+  inner.style.cssText = 'font-family:Nunito,sans-serif;';
+
+  // Close button
+  var closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&#10005;';
+  closeBtn.style.cssText = 'position:absolute;top:.6rem;right:.6rem;background:none;border:none;font-size:16px;cursor:pointer;color:#7a5c5c;padding:4px 8px;border-radius:6px;';
+  closeBtn.onclick = closeIconPicker;
+  inner.appendChild(closeBtn);
+
+  // Title
+  var title = document.createElement('h4');
+  title.textContent = 'Choose an Emoji Icon';
+  title.style.cssText = 'margin:0 0 .75rem;color:#3d1515;font-size:1rem;padding-right:2rem;';
+  inner.appendChild(title);
+
+  // Category tabs
+  var cats = Object.keys(EMOJI_SETS);
+  var tabRow = document.createElement('div');
+  tabRow.style.cssText = 'display:flex;gap:.4rem;margin-bottom:.75rem;flex-wrap:wrap;';
+  cats.forEach(function(cat) {
+    var tab = document.createElement('button');
+    tab.textContent = cat;
+    var active = cat === _iconPickerCat;
+    tab.style.cssText = 'padding:4px 10px;border-radius:20px;border:1px solid ' + (active ? '#3d1515' : '#e0d0cc') + ';background:' + (active ? '#3d1515' : 'white') + ';color:' + (active ? 'white' : '#5a3a3a') + ';font-size:12px;cursor:pointer;font-family:Nunito,sans-serif;font-weight:600;';
+    tab.onclick = function() { _iconPickerCat = cat; setupIconPickerEvents(); };
+    tabRow.appendChild(tab);
+  });
+  inner.appendChild(tabRow);
+
+  // Emoji grid
+  var emojis = EMOJI_SETS[_iconPickerCat] || [];
+  var grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:.75rem;max-height:180px;overflow-y:auto;';
+  emojis.forEach(function(emoji) {
+    var cell = document.createElement('div');
+    cell.innerHTML = emoji;
+    cell.className = 'icon-cell';
+    cell.title = 'Click to select';
+    cell.style.cssText = 'font-size:22px;text-align:center;padding:6px 2px;border-radius:8px;cursor:pointer;border:2px solid transparent;';
+    if (emoji === _iconPickerSelected) {
+      cell.style.background = '#fde8e8';
+      cell.style.borderColor = '#3d1515';
+    }
+    cell.onclick = function() { selectIconEmoji(emoji); };
+    grid.appendChild(cell);
+  });
+  inner.appendChild(grid);
+
+  // Current icon preview + instructions
+  var previewRow = document.createElement('div');
+  previewRow.style.cssText = 'display:flex;align-items:center;gap:.75rem;background:#faf8f7;border-radius:10px;padding:.6rem .75rem;margin-bottom:.75rem;';
   var size = ICON_SIZES[_iconPickerTarget] || 54;
-  return (
-    '<button class="icon-picker-close" onclick="closeIconPicker()">&#10005;</button>' +
-    '<h4 style="margin-bottom:.75rem;">Change Icon</h4>' +
-    '<div id="icon-preview-wrap" style="text-align:center;margin-bottom:.75rem;">' +
-    '<div id="icon-preview-box" style="display:inline-flex;align-items:center;justify-content:center;width:' + (size*2) + 'px;height:' + (size*2) + 'px;background:#f5e8e8;border-radius:12px;font-size:' + Math.round(size*1.2) + 'px;border:2px dashed #d9b0a9;overflow:hidden;"></div>' +
-    '<p style="font-size:11px;color:#7a5c5c;margin-top:5px;">Current icon &mdash; click below to replace</p>' +
-    '</div>' +
-    '<label class="icon-upload-btn" for="icon-upload-input" style="display:block;text-align:center;margin-bottom:.5rem;">&#128247;&nbsp; Choose image to upload</label>' +
-    '<input type="file" id="icon-upload-input" accept="image/*" style="display:none;" onchange="handleIconUpload(event)">' +
-    '<p style="font-size:11px;color:#7a5c5c;text-align:center;margin:0 0 .5rem;">PNG, JPG or SVG &mdash; automatically resized to fit</p>' +
-    '<div id="icon-upload-status" style="min-height:16px;font-size:12px;text-align:center;margin-bottom:.75rem;"></div>' +
-    '<div class="icon-picker-actions">' +
-    '<button class="icon-picker-reset" onclick="resetIconToDefault()">&#8635;&nbsp; Reset to default</button>' +
-    '<button class="icon-picker-apply" onclick="applyIconPicker()">Apply</button>' +
-    '</div>'
-  );
+  var previewBox = document.createElement('div');
+  previewBox.id = 'icon-preview-box';
+  previewBox.style.cssText = 'width:' + size + 'px;height:' + size + 'px;background:var(--maroon);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:' + Math.round(size*0.55) + 'px;flex-shrink:0;';
+  var srcEl = document.getElementById(_iconPickerTarget);
+  if (srcEl) previewBox.innerHTML = srcEl.innerHTML;
+  var instructions = document.createElement('div');
+  instructions.style.cssText = 'font-size:12px;color:#7a5c5c;font-family:Nunito,sans-serif;line-height:1.5;';
+  instructions.innerHTML = 'Choose an emoji above, then click <strong style="color:#3d1515;">Apply</strong> to save.';
+  previewRow.appendChild(previewBox);
+  previewRow.appendChild(instructions);
+  inner.appendChild(previewRow);
+
+  // Action buttons
+  var actions = document.createElement('div');
+  actions.className = 'icon-picker-actions';
+  
+  var resetBtn = document.createElement('button');
+  resetBtn.className = 'icon-picker-reset';
+  resetBtn.innerHTML = '&#8635; Reset';
+  resetBtn.onclick = resetIconToDefault;
+
+  var applyBtn = document.createElement('button');
+  applyBtn.className = 'icon-picker-apply';
+  applyBtn.innerHTML = '&#10003; Apply';
+  applyBtn.onclick = applyIconPicker;
+
+  actions.appendChild(resetBtn);
+  actions.appendChild(applyBtn);
+  inner.appendChild(actions);
+}
+
+
+function switchIconCat(cat) {
+  _iconPickerCat = cat;
+  _iconPickerWrap.innerHTML = buildIconPickerHTML();
+  setupIconPickerEvents();
+}
+
+function setupIconPickerEvents() {
+  // Wire category tab clicks
+  var catBtns = _iconPickerWrap.querySelectorAll('.icon-cat-btn');
+  catBtns.forEach(function(btn) {
+    btn.onclick = function() { switchIconCat(btn.getAttribute('data-cat')); };
+  });
+
+  // Wire emoji cell clicks
+  var cells = _iconPickerWrap.querySelectorAll('.icon-cell');
+  var emojis = EMOJI_SETS[_iconPickerCat] || [];
+  cells.forEach(function(cell, idx) {
+    cell.onclick = function() { selectIconEmoji(emojis[idx]); };
+  });
+
+  // Show current icon in preview
+  var box = document.getElementById('icon-preview-box');
+  if (box && _iconPickerTarget) {
+    var el = document.getElementById(_iconPickerTarget);
+    if (el) box.innerHTML = el.innerHTML;
+  }
 }
 function openIconPicker(elId, event) {
   _iconPickerTarget = elId;
@@ -1539,6 +1642,7 @@ function openIconPicker(elId, event) {
   _iconPickerUploadData = null;
   _iconPickerCat = 'Career';
   _iconPickerWrap.innerHTML = buildIconPickerHTML();
+  setupIconPickerEvents();
 
   // Position near the icon element (not event.target which may be a child)
   var iconEl = document.getElementById(elId);
@@ -2095,10 +2199,13 @@ function buildModalContent(name) {
 // ── ICONS MODAL ──────────────────────────────
 function buildIconsModal() {
   // Use a container div — populate via DOM after modal opens
-  return '<h3 style="font-family:Nunito,sans-serif;color:#3d1515;margin-bottom:1.25rem;">&#127914; Edit Icons</h3>' +
-    '<p style="font-size:13px;color:#7a5c5c;margin-bottom:1.5rem;">Click <strong>Change</strong> on any icon to swap the emoji.</p>' +
-    '<div id="icon-modal-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;"></div>' +
-    '<button id="icon-modal-done" style="width:100%;padding:12px;background:#f5f0ee;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-family:Nunito,sans-serif;color:#3d1515;font-weight:600;">Done</button>';
+  return '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;">' +
+      '<span style="font-size:1.5rem;line-height:1;">&#127914;</span>' +
+      '<h3 style="font-family:Nunito,sans-serif;color:#3d1515;margin:0;font-size:1.2rem;">Edit Icons</h3>' +
+    '</div>' +
+    '<p style="font-size:13px;color:#7a5c5c;margin-bottom:1.5rem;line-height:1.6;">Click <strong>Change</strong> on any icon below to choose a new emoji.</p>' +
+    '<div id="icon-modal-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.5rem;"></div>' +
+    '<button id="icon-modal-done" style="width:100%;padding:13px;background:#f5f0ee;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-family:Nunito,sans-serif;color:#3d1515;font-weight:700;">Done</button>';
 }
 
 function populateIconsModal() {
@@ -2107,15 +2214,20 @@ function populateIconsModal() {
   var doneBtn = document.getElementById('icon-modal-done');
   if (doneBtn) doneBtn.onclick = closeModal;
 
-  var iconLabels = {
-    'mission-v1-icon': 'Value Card 1',
-    'mission-v2-icon': 'Value Card 2',
-    'mission-v3-icon': 'Value Card 3',
-    'prog-prev1-icon': 'Program Card 1',
-    'prog-prev2-icon': 'Program Card 2',
-    'prog-prev3-icon': 'Program Card 3',
-    'contact-email-icon': 'Contact: Email',
-    'contact-phone-icon': 'Contact: Phone'
+  // Use actual content titles as labels where possible
+  var iconLabelKeys = {
+    'mission-v1-icon': 'mission_v1_title',
+    'mission-v2-icon': 'mission_v2_title',
+    'mission-v3-icon': 'mission_v3_title',
+    'prog-prev1-icon': 'prog_prev1_title',
+    'prog-prev2-icon': 'prog_prev2_title',
+    'prog-prev3-icon': 'prog_prev3_title',
+    'contact-email-icon': null,
+    'contact-phone-icon': null
+  };
+  var iconFallbackLabels = {
+    'contact-email-icon': 'Email Icon',
+    'contact-phone-icon': 'Phone Icon'
   };
 
   var iconIds = Object.keys(ICON_CKEYS);
@@ -2125,22 +2237,23 @@ function populateIconsModal() {
     (function(elId) {
       var cKey = ICON_CKEYS[elId];
       var current = C[cKey] || '&#9679;';
-      var label = iconLabels[elId] || elId;
+      var titleKey = iconLabelKeys[elId];
+      var label = titleKey ? (C[titleKey] || iconFallbackLabels[elId] || elId) : (iconFallbackLabels[elId] || elId);
 
       var item = document.createElement('div');
-      item.style.cssText = 'text-align:center;';
+      item.style.cssText = 'text-align:center;padding:1rem .75rem;background:#faf8f7;border-radius:14px;border:1px solid #e8ddd9;';
 
       var preview = document.createElement('div');
-      preview.style.cssText = 'width:54px;height:54px;background:var(--maroon);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto .5rem;';
+      preview.style.cssText = 'width:56px;height:56px;background:var(--maroon);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto .75rem;';
       preview.innerHTML = current;
 
       var lbl = document.createElement('div');
-      lbl.style.cssText = 'font-size:12px;color:#7a5c5c;margin-bottom:.5rem;font-family:Nunito,sans-serif;';
+      lbl.style.cssText = 'font-size:12px;color:#5a3a3a;margin-bottom:.75rem;font-family:Nunito,sans-serif;font-weight:700;line-height:1.4;min-height:2.8em;display:flex;align-items:center;justify-content:center;text-align:center;';
       lbl.textContent = label;
 
       var btn = document.createElement('button');
       btn.textContent = 'Change';
-      btn.style.cssText = 'width:100%;background:#3d1515;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif;';
+      btn.style.cssText = 'width:100%;background:#3d1515;color:white;border:none;border-radius:8px;padding:7px 4px;font-size:12px;cursor:pointer;font-family:Nunito,sans-serif;font-weight:600;';
       btn.onclick = function() { openIconPickerFromModal(elId); };
 
       item.appendChild(preview);
@@ -2152,14 +2265,24 @@ function populateIconsModal() {
 }
 
 function openIconPickerFromModal(elId) {
-  closeModal();
-  setTimeout(function() {
-    var el = document.getElementById(elId);
-    if (el) {
-      var rect = el.getBoundingClientRect();
-      openIconPicker(elId, { target: el, clientX: rect.left, clientY: rect.bottom });
-    }
-  }, 50);
+  // Keep modal open, open picker centered on screen above everything
+  _iconPickerTarget = elId;
+  _iconPickerSelected = null;
+  _iconPickerUploadData = null;
+  _iconPickerCat = 'Career';
+  _iconPickerWrap.innerHTML = buildIconPickerHTML();
+
+  // Center on screen
+  var pw = 320, ph = 440;
+  var left = Math.max(16, (window.innerWidth - pw) / 2);
+  var top = Math.max(60, (window.innerHeight - ph) / 2);
+  _iconPickerWrap.style.left = left + 'px';
+  _iconPickerWrap.style.top = top + 'px';
+  _iconPickerWrap.style.display = 'block';
+  _iconPickerWrap.style.zIndex = '20000'; // above modal overlay (10000)
+
+  // Wire up all events and show current icon
+  setTimeout(function() { setupIconPickerEvents(); }, 0);
 }
 
 // ── PHOTOS MODAL ─────────────────────────────
@@ -2998,7 +3121,7 @@ function buildModals() {
 
   var box = document.createElement('div');
   box.id = 'admin-modal-content';
-  box.style.cssText = 'background:white;border-radius:18px;width:100%;max-width:680px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);display:flex;flex-direction:column;';
+  box.style.cssText = 'background:white;border-radius:18px;width:100%;max-width:640px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:2rem;box-sizing:border-box;';
 
   overlay.appendChild(box);
   document.body.appendChild(overlay);
