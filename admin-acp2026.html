@@ -441,7 +441,7 @@ body.admin-mode{padding-top:44px;}body.admin-mode nav{top:44px;}
 var GH_OWNER = 'flick1284-gif';
 var GH_REPO  = 'acp';
 var GH_BRANCH = 'draft';
-var GH_TOKEN = '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'; // Replace this with your token
+var GH_PROXY = 'https://acp-github-proxy.flick1284.workers.dev';
 
 // ── PASSWORD GATE ─────────────────────────────
 var ADMIN_PW_HASH = '7e92d1ad7ea2d270a8bbddad6a5d9b81bb5d2e5fd3a9e9bf376c579bc10d67b6';
@@ -3014,8 +3014,8 @@ function previewSite() {
   if (!previewWin) { alert('Please allow popups for this page to use Preview.'); return; }
   previewWin.document.write('<html><body style="font-family:sans-serif;padding:2rem;color:#555;"><p>Loading preview…</p></body></html>');
 
-  fetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/index.html?ref=main', {
-    headers: { 'Authorization': 'token ' + GH_TOKEN, 'Accept': 'application/vnd.github+json' }
+  fetch(GH_PROXY + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/index.html?ref=main', {
+    headers: { 'Accept': 'application/vnd.github+json' }
   })
   .then(function(r) { if (!r.ok) throw new Error('Cannot fetch index.html'); return r.json(); })
   .then(function(data) {
@@ -3066,8 +3066,8 @@ function publishSite() {
   var adminFinal = null;
 
   // Fetch index.html from main branch
-  var indexPromise = fetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/index.html?ref=main', {
-    headers: { 'Authorization': 'token ' + GH_TOKEN, 'Accept': 'application/vnd.github+json' }
+  var indexPromise = fetch(GH_PROXY + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/index.html?ref=main', {
+    headers: { 'Accept': 'application/vnd.github+json' }
   }).then(function(r) {
     if (!r.ok) throw new Error('Cannot read index.html from GitHub');
     return r.json();
@@ -3084,9 +3084,9 @@ function publishSite() {
   });
 
   // Admin: fetch current admin from main branch and update baked data
- var adminSrcPath = 'admin-acp2026.html';
-  var adminPromise = fetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + adminSrcPath + '?ref=main', {
-    headers: { 'Authorization': 'token ' + GH_TOKEN, 'Accept': 'application/vnd.github+json' }
+  var adminSrcPath = 'admin-acp2026.html';
+  var adminPromise = fetch(GH_PROXY + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + adminSrcPath + '?ref=main', {
+    headers: { 'Accept': 'application/vnd.github+json' }
   }).then(function(r) {
     if (!r.ok) throw new Error('Cannot read ' + adminSrcPath + ' from GitHub');
     return r.json();
@@ -3130,11 +3130,10 @@ function publishSite() {
 
 async function commitToGitHub(files, message) {
   var headers = {
-    'Authorization': 'token ' + GH_TOKEN,
     'Accept': 'application/vnd.github+json',
     'Content-Type': 'application/json'
   };
-  var base = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO;
+  var base = GH_PROXY + '/repos/' + GH_OWNER + '/' + GH_REPO;
 
   // 1. Get the current commit SHA of the draft branch (create branch if needed)
   var branchSha, treeSha;
@@ -3201,11 +3200,10 @@ async function commitToGitHub(files, message) {
 
 async function commitImageToGitHub(filename, base64Data, mimeType) {
   var headers = {
-    'Authorization': 'token ' + GH_TOKEN,
     'Accept': 'application/vnd.github+json',
     'Content-Type': 'application/json'
   };
-  var base = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO;
+  var base = GH_PROXY + '/repos/' + GH_OWNER + '/' + GH_REPO;
   var path = 'images/' + filename;
 
   // Check if file exists (to get SHA for update)
