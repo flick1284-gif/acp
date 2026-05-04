@@ -1073,15 +1073,7 @@ function handleContact(e) {
   var btn     = document.getElementById('cf-submit');
   var result  = document.getElementById('cf-result');
 
-  // Check access key has been set
-  var key = form.querySelector('[name="access_key"]').value;
-  if (!key || key === 'b4e67ec5-17df-4b0a-953a-b05299cdce97') {
-    result.style.display = 'block';
-    result.style.background = '#fff8e6';
-    result.style.color = '#92400e';
-    result.textContent = '⚠ Form not yet activated. Add your Web3Forms access key (see setup note in the code).';
-    return;
-  }
+
 
   btn.disabled = true;
   btn.textContent = 'Sending…';
