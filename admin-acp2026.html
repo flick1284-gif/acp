@@ -1523,7 +1523,7 @@ function openIconUploadModal(elId) {
 
   var fileInput = document.createElement('input');
   fileInput.type = 'file';
-  fileInput.accept = 'image/*';
+  fileInput.accept = 'image/jpeg,image/png,.jpg,.jpeg,.png';
   dropzone.appendChild(fileInput);
   dropzone.onclick = function() { fileInput.click(); };
   fileInput.onchange = function(e) {
@@ -1701,14 +1701,11 @@ function initIconEditable() {
 
 // ── INIT ADMIN LAYER ─────────────────────────
 function initAdminLayer() {
-  // Clear any stale baked data from localStorage so admin always
-  // reflects what's actually on GitHub, not a previous local session.
-  // Content will be re-loaded fresh from GitHub via the BAKED snapshot
-  // that publishSite() injects into index.html on each publish.
+  // Clear stale localStorage so we don't use old local data
   var staleKeys = ['acp-content','acp-videos','acp-events','acp-res-aw','acp-res-cb','acp-res-ar','acp-programs','acp-photos'];
   staleKeys.forEach(function(k){ localStorage.removeItem(k); });
 
-  // Recalculate nextIds from loaded data
+  // Recalculate nextIds from baked-in baseline data
   var arrs = [
     ['videos', videos], ['events', events],
     ['resAW', resAW], ['resCB', resCB], ['resAR', resAR], ['programs', programs]
@@ -1718,6 +1715,7 @@ function initAdminLayer() {
     if (arr.length) nextIds[k] = Math.max.apply(null, arr.map(function(x){ return x.id||0; })) + 1;
   }
 
+  // Set up the admin UI immediately so it's interactive right away
   applyNavConfig();
   makeTextEditable();
   initAboutRTE();
@@ -1725,10 +1723,67 @@ function initAdminLayer() {
   injectCarouselOverlay();
   injectSectionButtons();
   buildModals();
-  // Extra safety: re-bind icon clicks after a short delay to ensure
-  // everything has rendered and no other script has overwritten handlers
   setTimeout(bindIconClicks, 50);
   setTimeout(bindIconClicks, 300);
+
+  // ── Fetch live content from GitHub in background ──────────────
+  // This ensures the admin always reflects the current live site,
+  // regardless of what was baked into this file at last publish.
+  var statusEl = document.getElementById('admin-save-status');
+  if (statusEl) {
+    statusEl.textContent = '\u21bb Syncing with live site...';
+    statusEl.style.opacity = '1';
+    statusEl.style.color = 'rgba(255,255,255,.7)';
+  }
+
+  fetch(GH_PROXY + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/index.html?ref=main', {
+    headers: { 'Accept': 'application/vnd.github+json' }
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('Cannot fetch index.html from GitHub (status ' + r.status + ')');
+    return r.json();
+  })
+  .then(function(data) {
+    var src = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+    var m = src.match(/<script id="baked-data">var BAKED=([\s\S]*?);<\/script>/);
+    if (!m) throw new Error('No BAKED data found in live index.html');
+    var baked = JSON.parse(m[1]);
+
+    // Update all content from live site and re-render
+    if (baked.content)  { C = Object.assign({}, DEFAULT_CONTENT, baked.content); applyContent(); }
+    if (baked.photos)   { photos   = baked.photos;   renderCarousel(); }
+    if (baked.videos)   { videos   = baked.videos;   renderVideos(); }
+    if (baked.events)   { events   = baked.events;   renderPageList('events'); }
+    if (baked.programs) { programs = baked.programs; renderPageList('programs'); }
+    if (baked.resAW)    { resAW    = baked.resAW; }
+    if (baked.resCB)    { resCB    = baked.resCB; }
+    if (baked.resAR)    { resAR    = baked.resAR; }
+    renderResourceSections();
+
+    // Recalculate nextIds from fresh data
+    var freshArrs = [
+      ['videos', videos], ['events', events],
+      ['resAW', resAW], ['resCB', resCB], ['resAR', resAR], ['programs', programs]
+    ];
+    for (var i = 0; i < freshArrs.length; i++) {
+      var k = freshArrs[i][0]; var arr = freshArrs[i][1];
+      if (arr.length) nextIds[k] = Math.max.apply(null, arr.map(function(x){ return x.id||0; })) + 1;
+    }
+
+    if (statusEl) {
+      statusEl.textContent = '\u2713 In sync with live site';
+      statusEl.style.color = '#7dd4a8';
+      setTimeout(function() { statusEl.style.opacity = '0'; }, 2500);
+    }
+  })
+  .catch(function(err) {
+    console.warn('GitHub sync failed — using baked content:', err.message);
+    if (statusEl) {
+      statusEl.textContent = '\u26a0 Offline — showing last saved content';
+      statusEl.style.color = '#fcd34d';
+      setTimeout(function() { statusEl.style.opacity = '0'; }, 5000);
+    }
+  });
 }
 
 // ── ABOUT PAGE RICH-TEXT EDITOR ───────────────
@@ -2164,10 +2219,10 @@ function buildPhotosModal() {
     '<div id="mph-grid" class="mph-grid">' + (grid || '<p class="modal-empty">No photos yet.</p>') + '</div>' +
     '<div id="mph-status" class="upload-status" style="display:none;"></div>' +
     '<div class="photo-upload-zone" style="position:relative;border:2px dashed var(--border);border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;background:var(--off-white);">' +
-    '<input type="file" accept="image/*" multiple onchange="handlePhotoUpload(event)" id="photo-file-input" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">' +
+    '<input type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" multiple onchange="handlePhotoUpload(event)" id="photo-file-input" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">' +
     '<div style="font-size:28px;margin-bottom:.5rem;">&#128247;</div>' +
     '<strong style="font-size:14px;color:var(--maroon);">Click to upload photos</strong>' +
-    '<p style="font-size:12px;color:var(--muted);margin-top:4px;">JPG, PNG, WebP &middot; Up to 10 total &middot; ' + photos.length + '/10 used</p>' +
+    '<p style="font-size:12px;color:var(--muted);margin-top:4px;">JPG, PNG only &middot; Up to 10 total &middot; ' + photos.length + '/10 used</p>' +
     '</div></div>'
   );
 }
@@ -2203,7 +2258,7 @@ function handlePhotoUpload(e) {
       if (statusEl) { statusEl.style.display='block'; statusEl.className='upload-status uploading'; statusEl.textContent='Uploading ' + file.name + '...'; }
       compressPhoto(file, 1200, 0.82, function(compressed) {
         var filename = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        commitImageToGitHub(filename, compressed, file.type)
+        commitImageToGitHub(filename, compressed, 'image/jpeg')
           .then(function(url) {
             photos.push({ src: url, caption: '' });
             uploaded++;
@@ -3209,14 +3264,14 @@ async function commitImageToGitHub(filename, base64Data, mimeType) {
   // Check if file exists (to get SHA for update)
   var existing = null;
   try {
-    var chkRes = await fetch(base + '/contents/' + path + '?ref=' + GH_BRANCH, { headers: headers });
+    var chkRes = await fetch(base + '/contents/' + path + '?ref=main', { headers: headers });
     if (chkRes.ok) { var chkData = await chkRes.json(); existing = chkData.sha; }
   } catch(e) {}
 
   var body = {
     message: 'Add image: ' + filename,
     content: base64Data.split(',')[1], // strip data:image/...;base64, prefix
-    branch: GH_BRANCH
+    branch: 'main'
   };
   if (existing) body.sha = existing;
 
@@ -3226,7 +3281,7 @@ async function commitImageToGitHub(filename, base64Data, mimeType) {
   });
   if (!res.ok) throw new Error('Image upload failed');
   var data = await res.json();
-  return 'https://raw.githubusercontent.com/' + GH_OWNER + '/' + GH_REPO + '/' + GH_BRANCH + '/' + path;
+  return 'https://raw.githubusercontent.com/' + GH_OWNER + '/' + GH_REPO + '/main/' + path;
 }
 
 function showPublishResult(ok, msg) {
