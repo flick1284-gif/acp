@@ -1523,7 +1523,7 @@ function openIconUploadModal(elId) {
 
   var fileInput = document.createElement('input');
   fileInput.type = 'file';
-  fileInput.accept = 'image/*';
+  fileInput.accept = 'image/jpeg,image/png,.jpg,.jpeg,.png';
   dropzone.appendChild(fileInput);
   dropzone.onclick = function() { fileInput.click(); };
   fileInput.onchange = function(e) {
@@ -1701,14 +1701,11 @@ function initIconEditable() {
 
 // ── INIT ADMIN LAYER ─────────────────────────
 function initAdminLayer() {
-  // Clear any stale baked data from localStorage so admin always
-  // reflects what's actually on GitHub, not a previous local session.
-  // Content will be re-loaded fresh from GitHub via the BAKED snapshot
-  // that publishSite() injects into index.html on each publish.
+  // Clear stale localStorage so we don't use old local data
   var staleKeys = ['acp-content','acp-videos','acp-events','acp-res-aw','acp-res-cb','acp-res-ar','acp-programs','acp-photos'];
   staleKeys.forEach(function(k){ localStorage.removeItem(k); });
 
-  // Recalculate nextIds from loaded data
+  // Recalculate nextIds from baked-in baseline data
   var arrs = [
     ['videos', videos], ['events', events],
     ['resAW', resAW], ['resCB', resCB], ['resAR', resAR], ['programs', programs]
@@ -1718,6 +1715,7 @@ function initAdminLayer() {
     if (arr.length) nextIds[k] = Math.max.apply(null, arr.map(function(x){ return x.id||0; })) + 1;
   }
 
+  // Set up the admin UI immediately so it's interactive right away
   applyNavConfig();
   makeTextEditable();
   initAboutRTE();
@@ -1725,10 +1723,67 @@ function initAdminLayer() {
   injectCarouselOverlay();
   injectSectionButtons();
   buildModals();
-  // Extra safety: re-bind icon clicks after a short delay to ensure
-  // everything has rendered and no other script has overwritten handlers
   setTimeout(bindIconClicks, 50);
   setTimeout(bindIconClicks, 300);
+
+  // ── Fetch live content from GitHub in background ──────────────
+  // This ensures the admin always reflects the current live site,
+  // regardless of what was baked into this file at last publish.
+  var statusEl = document.getElementById('admin-save-status');
+  if (statusEl) {
+    statusEl.textContent = '\u21bb Syncing with live site...';
+    statusEl.style.opacity = '1';
+    statusEl.style.color = 'rgba(255,255,255,.7)';
+  }
+
+  fetch(GH_PROXY + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/index.html?ref=main', {
+    headers: { 'Accept': 'application/vnd.github+json' }
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('Cannot fetch index.html from GitHub (status ' + r.status + ')');
+    return r.json();
+  })
+  .then(function(data) {
+    var src = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+    var m = src.match(/<script id="baked-data">var BAKED=([\s\S]*?);<\/script>/);
+    if (!m) throw new Error('No BAKED data found in live index.html');
+    var baked = JSON.parse(m[1]);
+
+    // Update all content from live site and re-render
+    if (baked.content)  { C = Object.assign({}, DEFAULT_CONTENT, baked.content); applyContent(); }
+    if (baked.photos)   { photos   = baked.photos;   renderCarousel(); }
+    if (baked.videos)   { videos   = baked.videos;   renderVideos(); }
+    if (baked.events)   { events   = baked.events;   renderPageList('events'); }
+    if (baked.programs) { programs = baked.programs; renderPageList('programs'); }
+    if (baked.resAW)    { resAW    = baked.resAW; }
+    if (baked.resCB)    { resCB    = baked.resCB; }
+    if (baked.resAR)    { resAR    = baked.resAR; }
+    renderResourceSections();
+
+    // Recalculate nextIds from fresh data
+    var freshArrs = [
+      ['videos', videos], ['events', events],
+      ['resAW', resAW], ['resCB', resCB], ['resAR', resAR], ['programs', programs]
+    ];
+    for (var i = 0; i < freshArrs.length; i++) {
+      var k = freshArrs[i][0]; var arr = freshArrs[i][1];
+      if (arr.length) nextIds[k] = Math.max.apply(null, arr.map(function(x){ return x.id||0; })) + 1;
+    }
+
+    if (statusEl) {
+      statusEl.textContent = '\u2713 In sync with live site';
+      statusEl.style.color = '#7dd4a8';
+      setTimeout(function() { statusEl.style.opacity = '0'; }, 2500);
+    }
+  })
+  .catch(function(err) {
+    console.warn('GitHub sync failed — using baked content:', err.message);
+    if (statusEl) {
+      statusEl.textContent = '\u26a0 Offline — showing last saved content';
+      statusEl.style.color = '#fcd34d';
+      setTimeout(function() { statusEl.style.opacity = '0'; }, 5000);
+    }
+  });
 }
 
 // ── ABOUT PAGE RICH-TEXT EDITOR ───────────────
@@ -2164,10 +2219,10 @@ function buildPhotosModal() {
     '<div id="mph-grid" class="mph-grid">' + (grid || '<p class="modal-empty">No photos yet.</p>') + '</div>' +
     '<div id="mph-status" class="upload-status" style="display:none;"></div>' +
     '<div class="photo-upload-zone" style="position:relative;border:2px dashed var(--border);border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;background:var(--off-white);">' +
-    '<input type="file" accept="image/*" multiple onchange="handlePhotoUpload(event)" id="photo-file-input" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">' +
+    '<input type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" multiple onchange="handlePhotoUpload(event)" id="photo-file-input" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">' +
     '<div style="font-size:28px;margin-bottom:.5rem;">&#128247;</div>' +
     '<strong style="font-size:14px;color:var(--maroon);">Click to upload photos</strong>' +
-    '<p style="font-size:12px;color:var(--muted);margin-top:4px;">JPG, PNG, WebP &middot; Up to 10 total &middot; ' + photos.length + '/10 used</p>' +
+    '<p style="font-size:12px;color:var(--muted);margin-top:4px;">JPG, PNG only &middot; Up to 10 total &middot; ' + photos.length + '/10 used</p>' +
     '</div></div>'
   );
 }
@@ -2203,7 +2258,7 @@ function handlePhotoUpload(e) {
       if (statusEl) { statusEl.style.display='block'; statusEl.className='upload-status uploading'; statusEl.textContent='Uploading ' + file.name + '...'; }
       compressPhoto(file, 1200, 0.82, function(compressed) {
         var filename = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        commitImageToGitHub(filename, compressed, file.type)
+        commitImageToGitHub(filename, compressed, 'image/jpeg')
           .then(function(url) {
             photos.push({ src: url, caption: '' });
             uploaded++;
@@ -3021,7 +3076,7 @@ function previewSite() {
   .then(function(data) {
     var src = decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
     var preview;
-    if (src.indexOf('<script id="baked-data">var BAKED={"content":{"nav_donate_btn":"Donate Here","hero_eyebrow":"Autistic-Led & Community-Driven","hero_h1_line1":"Build","hero_h1_emphasis":"WORK","hero_h1_line2":"that works for you!","hero_body":"Career assessment, mentorship, and entrepreneurial skill building for autistic professionals and business owners.","hero_btn_primary":"Get Started","hero_btn_secondary":"Watch Videos","hero_quote":"\"Autism Career Pathways gave me the tools to turn my passion into a real career path.\" — Community Member","hero_stat1_num":"500+","hero_stat1_label":"Members supported","hero_stat2_num":"100%","hero_stat2_label":"Autistic-led","hero_stat3_num":"Free","hero_stat3_label":"Resources & courses","hero_stat4_num":"3+","hero_stat4_label":"Active programs","carousel_tag":"Our Community","carousel_title":"Career Paths & Success Stories","carousel_body":"Celebrating the professional achievements and entrepreneurial spirit of our autistic role models.","mission_tag":"Our Mission","mission_title":"Empowering autistic individuals to build meaningful careers","mission_p1":"Autism Career Pathways is a nonprofit organization dedicated to empowering autistic individuals of all ages to build meaningful and sustainable career pathways. We provide autistic-led resources, mentorship, and video-based learning created by autistic entrepreneurs and professionals.","mission_p2":"Our evolving platform encourages community leaders to share knowledge and cultivate a supportive network that champions autistic-owned businesses and inclusive employment.","mission_p3":"Together, we are building a more inclusive future for the next generation of autistic individuals.","mission_v1_icon":"&#127775;","mission_v2_icon":"&#129309;","mission_v3_icon":"&#128640;","mission_v1_title":"Autistic-Led","mission_v1_body":"Resources created by autistic professionals who understand the journey firsthand.","mission_v2_title":"Community-Driven","mission_v2_body":"A supportive network that champions autistic-owned businesses and inclusive employment.","mission_v3_title":"Future-Focused","mission_v3_body":"Building sustainable pathways for the next generation of autistic entrepreneurs.","programs_tag":"What We Offer","programs_title":"Empowering autistic people to turn interests & unique skills into meaningful careers","programs_body":"Three pathways designed to meet you where you are and take you where you want to go.","prog_prev1_icon":"&#129517;","prog_prev2_icon":"&#127891;","prog_prev3_icon":"&#128172;","prog_prev1_title":"Career Assessment","prog_prev1_body":"The CAPABL tool helps you find your strengths, interests, and learning styles to map out your career path.","prog_prev2_title":"Online Courses","prog_prev2_body":"Find online courses led by autistic professionals helping parents and young adults develop skills and plan for future careers.","prog_prev3_title":"Professional Mentorship","prog_prev3_body":"Get advice from autistic mentors and business owners. Learn how to grow your career and balance work with your personal life.","contact_tag":"Connect With Us","contact_title":"Start Your Career Journey","contact_body":"Connect with our team for resources, mentorship, and guidance tailored to your goals.","contact_email_icon":"&#9993;","contact_phone_icon":"&#128222;","contact_email":"maisie@acpworks.org","contact_phone":"(650) 483-7174","contact_fb":"https://www.facebook.com/autismcareerpathways/","contact_ig":"https://www.instagram.com/autismcareerpathways/","contact_yt":"http://www.youtube.com/@autismcareerpathways","contact_x":"https://x.com/autisticcareers","contact_li":"http://www.linkedin.com/in/maisie-soetantyo","about_tag":"Who We Are","about_hero_title":"About Us","about_hero_body":"Learn about our mission, our team, and the community we are building together.","about_story_title":"Our Story","about_p1":"Autism Career Pathways is a nonprofit organization dedicated to empowering autistic individuals of all ages to build meaningful and sustainable career pathways.","about_p2":"We provide autistic-led resources, mentorship, and video-based learning created by autistic entrepreneurs and professionals. Our evolving platform encourages community leaders to share knowledge and cultivate a supportive network.","about_p3":"Together, we are building a more inclusive future for the next generation of autistic individuals.","training_tag":"Learn & Grow","training_hero_title":"Training","training_hero_body":"Join our upcoming workshops, webinars, and training sessions led by autistic professionals.","resources_tag":"Tools & Guides","resources_hero_title":"Resources","resources_hero_body":"Free tools, guides, and resources curated for autistic individuals and their supporters.","res_aw_tag":"Community","res_aw_title":"Autistically Wired","res_aw_body":"Resources, stories, and tools created by and for the autistic community.","res_cb_tag":"Directory","res_cb_title":"Certified Businesses","res_cb_body":"Autistic-owned and neurodivergent-friendly certified businesses in our network.","res_ar_tag":"More Resources","res_ar_title":"Additional Resources","res_ar_body":"Guides, tools, templates, and external links to support your career journey.","programs_page_tag":"Career Pathways","programs_page_hero_title":"Programs","programs_page_hero_body":"Explore our free programs designed to build skills, confidence, and career momentum.","video_tag":"Video Library","aw_video_tag":"Community","aw_video_title":"Autistically Wired","aw_video_body":"Resources, stories, and tools created by and for the autistic community.","video_hero_title":"Learn From Autistic Professionals","video_hero_body":"Watch talks, tutorials, and success stories from our community of autistic entrepreneurs and career experts.","donate_tag":"Support Our Mission","donate_hero_title":"Make a Difference Today","donate_hero_body":"Your donation helps autistic individuals build meaningful careers and access the resources they need to thrive.","donate_why_title":"Why your gift matters","donate_why_body":"Every contribution directly supports autistic individuals on their career journey, funding free resources, mentorship connections, and video-based learning.","donate_impact1":"$10 provides one month of access to our CAPABL career assessment tool","donate_impact2":"$25 sponsors a mentorship session between an autistic professional and a young job-seeker","donate_impact3":"$50 funds production of one new video lesson from an autistic expert","donate_impact4":"$100 supports a full month of platform operations and community events","nav_blog_label":"Blog","blog_visible":false,"nav_config":null,"blog_tag":"Our Blog","blog_hero_title":"News & Stories","blog_hero_body":"Insights, updates, and stories from the Autism Career Pathways community.","blog_content":"<p>Welcome to the Autism Career Pathways blog. Check back here for articles, updates, and stories from the autistic professional community.</p>","footer_text":"© 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved."},"videos":[{"id":1,"title":"Building a Career as an Autistic Entrepreneur","url":"dQw4w9WgXcQ","cat":"entrepreneurship","speaker":"Autism Career Pathways","desc":"Discover how to leverage your unique autistic strengths to build a thriving business."},{"id":2,"title":"CAPABL: Finding Your Strengths","url":"dQw4w9WgXcQ","cat":"career","speaker":"Maisie Soetantyo","desc":"A walkthrough of the Career Assessment Protocol and how it maps your ideal career."},{"id":3,"title":"Mentorship in Action","url":"dQw4w9WgXcQ","cat":"success","speaker":"Community Member","desc":"How mentorship through ACP changed a career trajectory."}],"events":[{"id":1,"title":"CAPABL Career Assessment Workshop","date":"April 2026","format":"Webinar","link":"","desc":"A guided walkthrough of the Career Assessment Protocol: Abilities Beyond Labels."},{"id":2,"title":"Entrepreneurship 101 for Autistic Professionals","date":"May 2026","format":"Workshop","link":"","desc":"An introductory workshop covering starting and running a business as an autistic entrepreneur."}],"resAW":[{"id":1,"title":"Autism Career Pathways Community","type":"Tool","desc":"Connect with other autistic professionals in our community network.","link":""}],"resCB":[{"id":1,"title":"ACP Certified Partner Businesses","type":"Certified Partner","desc":"Businesses committed to inclusive hiring and supporting neurodivergent employees.","link":""}],"resAR":[{"id":1,"title":"CAPABL Career Assessment Tool","type":"Tool","desc":"Free self-assessment to identify your strengths and map them to career paths.","link":""},{"id":2,"title":"Autism and Employment: A Guide for Job Seekers","type":"Guide","desc":"A comprehensive guide covering disclosure, accommodations, and workplace rights.","link":""}],"programs":[{"id":1,"title":"Exploring and Leveraging Autistic Interests","link":"","desc":"Learn how to channel your autistic interests into meaningful career opportunities."},{"id":2,"title":"Autism and Career: Your Path Forward","link":"","desc":"A structured program to help you define your career goals."},{"id":3,"title":"Building a Successful Career: Strategies for Individuals with Autism","link":"","desc":"Evidence-based strategies for navigating the modern workplace."}]};</script>') >= 0) {
+    if (src.indexOf('<script id="baked-data">var BAKED={"content":{"nav_donate_btn":"Donate Here","hero_eyebrow":"Autistic-Led & Community-Driven","hero_h1_line1":"Build","hero_h1_emphasis":"WORK","hero_h1_line2":"that works for you!","hero_body":"Career assessment, mentorship, and entrepreneurial skill building for autistic professionals and business owners.","hero_btn_primary":"Get Started","hero_btn_secondary":"Watch Videos","hero_quote":"\"Autism Career Pathways gave me the tools to turn my passion into a real career path.\" — Community Member","hero_stat1_num":"500+","hero_stat1_label":"Members supported","hero_stat2_num":"100%","hero_stat2_label":"Autistic-led","hero_stat3_num":"Free","hero_stat3_label":"Resources & courses","hero_stat4_num":"3+","hero_stat4_label":"Active programs","carousel_tag":"Our Community","carousel_title":"Career Paths & Success Stories","carousel_body":"Celebrating the professional achievements and entrepreneurial spirit of our autistic role models.","mission_tag":"Our Mission","mission_title":"Empowering autistic individuals to build meaningful careers","mission_p1":"Autism Career Pathways is a nonprofit organization dedicated to empowering autistic individuals of all ages to build meaningful and sustainable career pathways. We provide autistic-led resources, mentorship, and video-based learning created by autistic entrepreneurs and professionals.","mission_p2":"Our evolving platform encourages community leaders to share knowledge and cultivate a supportive network that champions autistic-owned businesses and inclusive employment.","mission_p3":"Together, we are building a more inclusive future for the next generation of autistic individuals.","mission_v1_icon":"&#127775;","mission_v2_icon":"&#129309;","mission_v3_icon":"&#128640;","mission_v1_title":"Autistic-Led","mission_v1_body":"Resources created by autistic professionals who understand the journey firsthand.","mission_v2_title":"Community-Driven","mission_v2_body":"A supportive network that champions autistic-owned businesses and inclusive employment.","mission_v3_title":"Future-Focused","mission_v3_body":"Building sustainable pathways for the next generation of autistic entrepreneurs.","programs_tag":"What We Offer","programs_title":"Empowering autistic people to turn interests & unique skills into meaningful careers","programs_body":"Three pathways designed to meet you where you are and take you where you want to go.","prog_prev1_icon":"&#129517;","prog_prev2_icon":"&#127891;","prog_prev3_icon":"&#128172;","prog_prev1_title":"Career Assessment","prog_prev1_body":"The CAPABL tool helps you find your strengths, interests, and learning styles to map out your career path.","prog_prev2_title":"Online Courses","prog_prev2_body":"Find online courses led by autistic professionals helping parents and young adults develop skills and plan for future careers.","prog_prev3_title":"Professional Mentorship","prog_prev3_body":"Get advice from autistic mentors and business owners. Learn how to grow your career and balance work with your personal life.","contact_tag":"Connect With Us","contact_title":"Start Your Career Journey","contact_body":"Connect with our team for resources, mentorship, and guidance tailored to your goals.","contact_email_icon":"&#9993;","contact_phone_icon":"&#128222;","contact_email":"maisie@acpworks.org","contact_phone":"(650) 483-7174","contact_fb":"https://www.facebook.com/autismcareerpathways/","contact_ig":"https://www.instagram.com/autismcareerpathways/","contact_yt":"http://www.youtube.com/@autismcareerpathways","contact_x":"https://x.com/autisticcareers","contact_li":"http://www.linkedin.com/in/maisie-soetantyo","about_tag":"Who We Are","about_hero_title":"About Us","about_hero_body":"Learn about our mission, our team, and the community we are building together.","about_story_title":"Our Story","about_p1":"Autism Career Pathways is a nonprofit organization dedicated to empowering autistic individuals of all ages to build meaningful and sustainable career pathways.","about_p2":"We provide autistic-led resources, mentorship, and video-based learning created by autistic entrepreneurs and professionals. Our evolving platform encourages community leaders to share knowledge and cultivate a supportive network.","about_p3":"Together, we are building a more inclusive future for the next generation of autistic individuals.","training_tag":"Learn & Grow","training_hero_title":"Training","training_hero_body":"Join our upcoming workshops, webinars, and training sessions led by autistic professionals.","resources_tag":"Tools & Guides","resources_hero_title":"Resources","resources_hero_body":"Free tools, guides, and resources curated for autistic individuals and their supporters.","res_aw_tag":"Community","res_aw_title":"Autistically Wired","res_aw_body":"Resources, stories, and tools created by and for the autistic community.","res_cb_tag":"Directory","res_cb_title":"Certified Businesses","res_cb_body":"Autistic-owned and neurodivergent-friendly certified businesses in our network.","res_ar_tag":"More Resources","res_ar_title":"Additional Resources","res_ar_body":"Guides, tools, templates, and external links to support your career journey.","programs_page_tag":"Career Pathways","programs_page_hero_title":"Programs","programs_page_hero_body":"Explore our free programs designed to build skills, confidence, and career momentum.","video_tag":"Video Library","aw_video_tag":"Community","aw_video_title":"Autistically Wired","aw_video_body":"Resources, stories, and tools created by and for the autistic community.","video_hero_title":"Learn From Autistic Professionals","video_hero_body":"Watch talks, tutorials, and success stories from our community of autistic entrepreneurs and career experts.","donate_tag":"Support Our Mission","donate_hero_title":"Make a Difference Today","donate_hero_body":"Your donation helps autistic individuals build meaningful careers and access the resources they need to thrive.","donate_why_title":"Why your gift matters","donate_why_body":"Every contribution directly supports autistic individuals on their career journey, funding free resources, mentorship connections, and video-based learning.","donate_impact1":"$10 provides one month of access to our CAPABL career assessment tool","donate_impact2":"$25 sponsors a mentorship session between an autistic professional and a young job-seeker","donate_impact3":"$50 funds production of one new video lesson from an autistic expert","donate_impact4":"$100 supports a full month of platform operations and community events","nav_blog_label":"Blog","blog_visible":false,"nav_config":null,"blog_tag":"Our Blog","blog_hero_title":"News & Stories","blog_hero_body":"Insights, updates, and stories from the Autism Career Pathways community.","blog_content":"<p>Welcome to the Autism Career Pathways blog. Check back here for articles, updates, and stories from the autistic professional community.</p>","footer_text":"© 2026 Autism Career Pathways. Empowering neurodivergent individuals through career exploration and entrepreneurial growth. All rights reserved."},"videos":[{"id":1,"title":"Building a Career as an Autistic Entrepreneur","url":"dQw4w9WgXcQ","cat":"entrepreneurship","speaker":"Autism Career Pathways","desc":"Discover how to leverage your unique autistic strengths to build a thriving business."},{"id":2,"title":"CAPABL: Finding Your Strengths","url":"dQw4w9WgXcQ","cat":"career","speaker":"Maisie Soetantyo","desc":"A walkthrough of the Career Assessment Protocol and how it maps your ideal career."},{"id":3,"title":"Mentorship in Action","url":"dQw4w9WgXcQ","cat":"success","speaker":"Community Member","desc":"How mentorship through ACP changed a career trajectory."},{"title":"Yi Jiang (YL)","url":"rTsvkSwZZRI","cat":"aw","speaker":"Maisie Soetantyo","desc":"In this episode of Autistically Wired, Maisie Soetantyo sits down with Yi Liang (YL), a Malaysian journalist, author, and longtime advocate, to explore how autism has shaped his career, perspective, and purpose.","id":4}],"events":[{"id":1,"title":"CAPABL Career Assessment Workshop","date":"April 2026","format":"Webinar","link":"","desc":"A guided walkthrough of the Career Assessment Protocol: Abilities Beyond Labels."},{"id":2,"title":"Entrepreneurship 101 for Autistic Professionals","date":"May 2026","format":"Workshop","link":"","desc":"An introductory workshop covering starting and running a business as an autistic entrepreneur."}],"resAW":[{"id":1,"title":"Autism Career Pathways Community","type":"Tool","desc":"Connect with other autistic professionals in our community network.","link":""}],"resCB":[{"id":1,"title":"ACP Certified Partner Businesses","type":"Certified Partner","desc":"Businesses committed to inclusive hiring and supporting neurodivergent employees.","link":""}],"resAR":[{"id":1,"title":"CAPABL Career Assessment Tool","type":"Tool","desc":"Free self-assessment to identify your strengths and map them to career paths.","link":""},{"id":2,"title":"Autism and Employment: A Guide for Job Seekers","type":"Guide","desc":"A comprehensive guide covering disclosure, accommodations, and workplace rights.","link":""}],"programs":[{"id":1,"title":"Exploring and Leveraging Autistic Interests","link":"","desc":"Learn how to channel your autistic interests into meaningful career opportunities."},{"id":2,"title":"Autism and Career: Your Path Forward","link":"","desc":"A structured program to help you define your career goals."},{"id":3,"title":"Building a Successful Career: Strategies for Individuals with Autism","link":"","desc":"Evidence-based strategies for navigating the modern workplace."}]};</script>') >= 0) {
       preview = src.replace('<!--BAKED-DATA-->', dataScript);
     } else if (src.indexOf('id="baked-data"') >= 0) {
       preview = src.replace(/<script id="baked-data">[\s\S]*?<\/script>/, dataScript);
@@ -3209,14 +3264,14 @@ async function commitImageToGitHub(filename, base64Data, mimeType) {
   // Check if file exists (to get SHA for update)
   var existing = null;
   try {
-    var chkRes = await fetch(base + '/contents/' + path + '?ref=' + GH_BRANCH, { headers: headers });
+    var chkRes = await fetch(base + '/contents/' + path + '?ref=main', { headers: headers });
     if (chkRes.ok) { var chkData = await chkRes.json(); existing = chkData.sha; }
   } catch(e) {}
 
   var body = {
     message: 'Add image: ' + filename,
     content: base64Data.split(',')[1], // strip data:image/...;base64, prefix
-    branch: GH_BRANCH
+    branch: 'main'
   };
   if (existing) body.sha = existing;
 
@@ -3226,7 +3281,7 @@ async function commitImageToGitHub(filename, base64Data, mimeType) {
   });
   if (!res.ok) throw new Error('Image upload failed');
   var data = await res.json();
-  return 'https://raw.githubusercontent.com/' + GH_OWNER + '/' + GH_REPO + '/' + GH_BRANCH + '/' + path;
+  return 'https://raw.githubusercontent.com/' + GH_OWNER + '/' + GH_REPO + '/main/' + path;
 }
 
 function showPublishResult(ok, msg) {
