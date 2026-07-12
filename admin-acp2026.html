@@ -440,7 +440,7 @@ body.admin-mode{padding-top:44px;}body.admin-mode nav{top:44px;}
 // ── GITHUB CONFIG ─────────────────────────────
 var GH_OWNER = 'flick1284-gif';
 var GH_REPO  = 'acp';
-var GH_BRANCH = 'draft';
+var GH_BRANCH = 'main';
 var GH_PROXY = 'https://acp-github-proxy.flick1284.workers.dev';
 
 // ── PASSWORD GATE ─────────────────────────────
@@ -3181,7 +3181,7 @@ function publishSite() {
     ADMIN_DIRTY = false;
     updateDirtyIndicator();
     if (btn) { btn.innerHTML = '&#10003; Published!'; btn.style.background = '#16a34a'; btn.style.borderColor = '#15803d'; }
-    showPublishResult(true, 'Changes saved! Your developer will review and push live shortly.');
+    showPublishResult(true, 'Published! Changes are now live on the site.');
     setTimeout(function() {
       if (btn) { btn.innerHTML = '&#9729; Save &amp; Publish'; btn.style.background = ''; btn.style.borderColor = ''; btn.disabled = false; }
     }, 4000);
@@ -3260,19 +3260,6 @@ async function commitToGitHub(files, message) {
   });
   if (!updateRes.ok) throw new Error('Branch update failed');
 
-  // 7. Merge draft → main directly (token has contents:write, no PR needed)
-  var mergeRes = await fetch(base + '/merges', {
-    method: 'POST', headers: headers,
-    body: JSON.stringify({
-      base: 'main',
-      head: GH_BRANCH,
-      commit_message: message
-    })
-  });
-  // 201 = merged, 204 = already up to date — both are success
-  if (!mergeRes.ok && mergeRes.status !== 204) {
-    throw new Error('Merge to main failed (status ' + mergeRes.status + ')');
-  }
 }
 
 async function commitImageToGitHub(filename, base64Data, mimeType) {
