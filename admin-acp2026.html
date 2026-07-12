@@ -3260,23 +3260,18 @@ async function commitToGitHub(files, message) {
   });
   if (!updateRes.ok) throw new Error('Branch update failed');
 
-  // 7. Auto-create PR from draft → main (non-fatal if one already exists)
-  try {
-    var prRes = await fetch(base + '/pulls', {
-      method: 'POST', headers: headers,
-      body: JSON.stringify({
-        title: message,
-        head: GH_BRANCH,
-        base: 'main',
-        body: 'Content update submitted from the ACP admin. Review and merge to publish live.'
-      })
-    });
-    // 422 = PR already open for this branch — safe to ignore
-    if (!prRes.ok && prRes.status !== 422) {
-      console.warn('PR creation returned unexpected status', prRes.status);
-    }
-  } catch(e) {
-    console.warn('PR creation failed (non-fatal):', e.message);
+  // 7. Merge draft → main directly (token has contents:write, no PR needed)
+  var mergeRes = await fetch(base + '/merges', {
+    method: 'POST', headers: headers,
+    body: JSON.stringify({
+      base: 'main',
+      head: GH_BRANCH,
+      commit_message: message
+    })
+  });
+  // 201 = merged, 204 = already up to date — both are success
+  if (!mergeRes.ok && mergeRes.status !== 204) {
+    throw new Error('Merge to main failed (status ' + mergeRes.status + ')');
   }
 }
 
